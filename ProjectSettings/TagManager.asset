@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Item
+  - PlayerObject
+  - SpawnLight
+  - LocationZone
+  - PlayerSelf
+  - Computer
   layers:
   - Default
   - TransparentFX
@@ -18,8 +24,8 @@ TagManager:
   - GlobalLighting
   - ComputerUI
   - NoBloomPostPr
-  - 
-  - 
+  - Items
+  - GroundedItems
   - 
   - 
   - 

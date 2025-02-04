@@ -6,6 +6,9 @@ public class ComputerScreenHandler : MonoBehaviour
     public TextMeshProUGUI computerDisplay;
     public GameObject subScreenLight;
     public GameObject mainScreenLight;
+    private GameObject computerHolder;
+    private AudioSource computerSFXSource;
+    public CameraTransitionHandler camTransitionHandler;
 
     public bool isTurnedOn = false;
     public KeyCode interactKey = KeyCode.E;
@@ -22,8 +25,17 @@ public class ComputerScreenHandler : MonoBehaviour
             Debug.LogError("ComputerScreenHandler: Screen Emissive Material is not assigned!");
         }
         screenEmissiveMaterial.DisableKeyword("_EMISSION");
+        GetRefs();
+        computerSFXSource.enabled = false;
 
     }
+
+    private void GetRefs()
+    {
+        computerHolder = GameObject.FindGameObjectWithTag("Computer");
+        computerSFXSource = computerHolder.GetComponent<AudioSource>();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -52,7 +64,12 @@ public class ComputerScreenHandler : MonoBehaviour
     }
 
     public void TurnOnComputer()
-    {
+    {   
+
+        camTransitionHandler.StartSwitchToTargetCam(.6f);
+        computerSFXSource.enabled = true;
+        computerSFXSource.Play();
+
         isTurnedOn = true;
         computerDisplay.text = "";
         if (!subScreenLight.activeSelf && !mainScreenLight.activeSelf)
@@ -69,7 +86,9 @@ public class ComputerScreenHandler : MonoBehaviour
     }
 
     public void TurnOffComputer()
-    {
+    {   
+        computerSFXSource.enabled = false;
+        camTransitionHandler.StartSwitchToPlayerCam(.6f);
         isTurnedOn = false;
         computerDisplay.text = "";
         if (subScreenLight.activeSelf && mainScreenLight.activeSelf)

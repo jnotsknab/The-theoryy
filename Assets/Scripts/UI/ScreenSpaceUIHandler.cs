@@ -4,14 +4,18 @@ using UnityEngine;
 public class ScreenSpaceUIHandler : MonoBehaviour
 {
     public GameObject uiPopup;
+    public GameObject shotgunUIPopup;
     
     public GameObject targetGameObject; // Reference to the GameObject you want to check against
+    public GameObject shotgunGameObject;
     public ComputerScreenHandler computerScreenHandler;
+    public ItemPickupHandler itemPickupHandler;
     public float maxDistance; // Maximum distance within which the popup will show
     public float fadeDuration = 1f; // Duration of fade in/out
     private float distance; // Distance between the player and the target GameObject
     public KeyCode interactKey = KeyCode.E;
     private bool on = false;
+    private bool uiFilled = false;
 
     private Camera playerCamera;
     private CanvasGroup canvasGroup;
@@ -32,6 +36,7 @@ public class ScreenSpaceUIHandler : MonoBehaviour
 
         canvasGroup.alpha = 0f; // Start as invisible
         uiPopup.SetActive(false);
+        shotgunUIPopup.SetActive(false);
 
         if (targetGameObject == null)
         {
@@ -40,59 +45,122 @@ public class ScreenSpaceUIHandler : MonoBehaviour
     }
 
     // Update is called once per frame
+
     void Update()
-    {
+    {   
+
+        // Reset uiFilled before any checks
+        uiFilled = false;
+
+        // Check all UIs
         ComputerUIPopupCheck();
+        StandardUIPopupCheck(shotgunGameObject);
+
+        //Debug.Log($"Update: uiFilled = {uiFilled}");
     }
 
     private void ComputerUIPopupCheck()
     {
         if (targetGameObject.activeSelf)
         {
-            // Calculate the distance between the player and the target GameObject
+            // Calculate distance
             distance = Vector3.Distance(playerCamera.transform.position, targetGameObject.transform.position);
         }
         else
         {
             distance = maxDistance + 1f;
         }
-        
 
-        // Check if the player is within the max distance of the target GameObject
+        //Debug.Log($"ComputerUIPopupCheck: distance = {distance}, maxDistance = {maxDistance}, uiFilled = {uiFilled}");
+
         if (distance <= maxDistance)
         {
             if (Input.GetKeyDown(interactKey) && uiPopup.activeSelf && !on)
             {
                 computerScreenHandler.TurnOnComputer();
-               /* targetGameObject.SetActive(false);*/
                 uiPopup.SetActive(false);
-                on = true; // Set the computer state to "on"
-                Debug.LogWarning("If statement turning on computer has been entered");
+                on = true; // Computer is on
+                uiFilled = true; // Block other UIs
+                Debug.Log("Computer turned ON");
             }
             else if (Input.GetKeyDown(interactKey) && on)
             {
                 computerScreenHandler.TurnOffComputer();
-                targetGameObject.SetActive(true);
-                uiPopup.SetActive(true);
-                on = false; // Set the computer state to "off"
-                Debug.LogWarning("If statement turning off computer has been entered");
+                uiPopup.SetActive(false);
+                on = false; // Computer is off
+                uiFilled = false; // Block other UIs
+                Debug.Log("Computer turned OFF");
             }
 
-            // Fade in the popup
+            // Fade in
             if (canvasGroup.alpha < 1f && (fadeCoroutine == null || !uiPopup.activeSelf))
             {
-                StartFade(true); // Start fade-in
+                StartFade(true);
             }
+
+            uiFilled = true; // Ensure uiFilled is true when this UI is active
         }
         else
         {
-            // Fade out the popup
+            // Fade out
             if (canvasGroup.alpha > 0f && fadeCoroutine == null)
             {
-                StartFade(false); // Start fade-out
+                StartFade(false);
             }
         }
+
+        //Debug.Log($"ComputerUIPopupCheck END: uiFilled = {uiFilled}, on = {on}, uiPopup.activeSelf = {uiPopup.activeSelf}");
     }
+
+    private void StandardUIPopupCheck(GameObject targetObject)
+    {
+        if (targetObject.activeSelf)
+        {
+            // Calculate distance
+            distance = Vector3.Distance(playerCamera.transform.position, targetObject.transform.position);
+        }
+        else
+        {
+            distance = maxDistance + 1f;
+        }
+
+        //Debug.Log($"StandardUIPopupCheck: distance = {distance}, maxDistance = {maxDistance}, targetObject = {targetObject.name}, uiFilled = {uiFilled}");
+
+        if (distance <= maxDistance)
+        {
+            if (!uiFilled) // Only show if no other UI is active
+            {
+                shotgunUIPopup.SetActive(true);
+                uiFilled = true; // Block other UIs
+                //Debug.Log($"Shotgun UI activated for {targetObject.name}");
+            }
+        }
+        else if (distance >= maxDistance)
+        {
+            shotgunUIPopup.SetActive(false);
+            uiFilled = false;
+            //Debug.Log($"Shotgun UI deactivated for {targetObject.name}");
+        }
+        else
+        {
+            if (uiFilled)
+            {
+                shotgunUIPopup.SetActive(false);
+                //Debug.Log($"Shotgun UI deactivated for {targetObject.name}");
+            }
+        }
+
+        // If item is picked up, hide the UI
+        if (itemPickupHandler.pickedUp)
+        {
+            shotgunUIPopup.SetActive(false);
+            uiFilled = false; // Allow other UIs
+            //Debug.Log($"Item picked up. Hiding shotgun UI for {targetObject.name}");
+        }
+
+        //Debug.Log($"StandardUIPopupCheck END: uiFilled = {uiFilled}, shotgunUIPopup.activeSelf = {shotgunUIPopup.activeSelf}");
+    }
+
     private void StartFade(bool fadeIn)
     {
         // Stop the current coroutine if one is active
@@ -113,6 +181,7 @@ public class ScreenSpaceUIHandler : MonoBehaviour
 
         if (fadeIn)
         {
+            uiFilled = true;
             uiPopup.SetActive(true); // Ensure the popup is active during fade-in
         }
 
@@ -129,7 +198,8 @@ public class ScreenSpaceUIHandler : MonoBehaviour
         canvasGroup.alpha = endAlpha; // Ensure the final alpha is exactly the target value
 
         if (!fadeIn)
-        {
+        {   
+            uiFilled = false;
             uiPopup.SetActive(false); // Deactivate the popup after fade-out
         }
 
