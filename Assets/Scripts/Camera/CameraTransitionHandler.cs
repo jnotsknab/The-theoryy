@@ -2,29 +2,43 @@ using UnityEngine;
 using System.Collections;
 
 public class CameraTransitionHandler : MonoBehaviour
-{
+{   
     public Camera playerCam;
     public Camera targetCam;
+
+    [Header("Player References")]
     public Player player;
     public float transitionSpeed;
     public PlayerMovement playerMovement;
     public GameObject playerModel;
-
+    public GameObject playerArms;
     //Placeholder until arms are combined with full character model.
     public GameObject pill;
 
-    private Vector3 originalPlayerCamPosition;
-    private Quaternion originalPlayerCamRotation;
+    [Header("Items and Item Logic")]
+    private ItemPickupHandler itemPickupHandler;
+    public GameObject sawedOff;
+    private ShotgunLogic shotgunLogic;
 
-    private Vector3 originalTargetCamPosition;
-    private Quaternion originalTargetCamRotation;
+    [SerializeField] private Vector3 originalPlayerCamPosition;
+    [SerializeField] private Quaternion originalPlayerCamRotation;
+    [SerializeField] private Vector3 originalTargetCamPosition;
+    [SerializeField] private Quaternion originalTargetCamRotation;
 
     private void Start()
     {
-        // Store original positions at the beginning
+        itemPickupHandler = player.GetComponent<ItemPickupHandler>();
         
+        //Shotgun Logic needed to disable the renderer on the shotgun shells after we enable all renderers attached to the player.
+        //Shitty solution should find a more scaleable fix in the future.
+        shotgunLogic = sawedOff.GetComponent<ShotgunLogic>();
     }
 
+    /// <summary>
+    /// Smoothly transitions from the Playercam to the Targetcam.
+    /// </summary>
+    /// <param name="transitionDuration"></param>
+    /// <returns></returns>
     IEnumerator SwitchToTargetCam(float transitionDuration)
     {   
         StoreInitialTransforms();
@@ -52,8 +66,7 @@ public class CameraTransitionHandler : MonoBehaviour
 
         while (elapsedTime < transitionDuration)
         {
-            float t = elapsedTime / transitionDuration;
-            t = t * t * (3f - 2f * t); // Smoothstep for smoother transition
+            float t = Mathf.SmoothStep(0f, 1f, elapsedTime / transitionDuration);
 
             targetCam.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
             targetCam.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
@@ -65,13 +78,18 @@ public class CameraTransitionHandler : MonoBehaviour
         targetCam.transform.position = originalTargetCamPosition;
         targetCam.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         //playerCam.GetComponent<PlayerCam>().canRotate = true;
-        targetCam.GetComponent<StaticCamController>().canRotateStatic = true;
-        playerModel.SetActive(false);
+        targetCam.GetComponent<StaticCamController>().canRotateStatic = false;
+
+        DisablePlayerRender();
         pill.GetComponent<MeshRenderer>().enabled = false;
     }
 
 
-
+    /// <summary>
+    /// Smoothly transitions from the Targetcam to the Playercam.
+    /// </summary>
+    /// <param name="transitionDuration"></param>
+    /// <returns></returns>
     IEnumerator SwitchToPlayerCam(float transitionDuration)
     {
         playerCam.GetComponent<PlayerCam>().canRotate = false;
@@ -96,8 +114,7 @@ public class CameraTransitionHandler : MonoBehaviour
 
         while (elapsedTime < transitionDuration)
         {
-            float t = elapsedTime / transitionDuration;
-            t = t * t * (3f - 2f * t); // Smoothstep for smoother transition
+            float t = Mathf.SmoothStep(0f, 1f, elapsedTime / transitionDuration);
 
             playerCam.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
             playerCam.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
@@ -115,18 +132,32 @@ public class CameraTransitionHandler : MonoBehaviour
 
         playerCam.GetComponent<PlayerCam>().canRotate = true;
         player.EnablePlayerMovement();
-        playerModel.SetActive(true);
+
+
+        EnablePlayerRender();
+
+        //Disable shell renderers after enabling them from the EnablePlayerRender as they arent active until their animations are played.
+        shotgunLogic.ResetShells();
+
         pill.GetComponent<MeshRenderer>().enabled = true;
     }
 
 
 
 
+    /// <summary>
+    /// Helper Function to start the targetCam couroutine transition.
+    /// </summary>
+    /// <param name="transitionDuration"></param>
     public void StartSwitchToTargetCam(float transitionDuration)
     {
         StartCoroutine(SwitchToTargetCam(transitionDuration));
     }
 
+    /// <summary>
+    /// Helper Function to start the playerCam couroutine transition.
+    /// </summary>
+    /// <param name="transitionDuration"></param>
     public void StartSwitchToPlayerCam(float transitionDuration)
     {
         StartCoroutine(SwitchToPlayerCam(transitionDuration));
@@ -140,5 +171,31 @@ public class CameraTransitionHandler : MonoBehaviour
         originalTargetCamPosition = targetCam.transform.position;
         originalTargetCamRotation = targetCam.transform.rotation;
     }
+
+    /// <summary>
+    /// Disables the player renderer and all the renderers of the players child objects.
+    /// </summary>
+    private void DisablePlayerRender()
+    {
+        playerModel.GetComponent<Renderer>().enabled = false;
+        foreach (Renderer renderer in playerModel.GetComponentsInChildren<Renderer>())
+        {
+            renderer.enabled = false;
+        }
+    }
+
+    /// <summary>
+    /// Enables the player renderer and all the renderers of the players child objects.
+    /// </summary>
+    private void EnablePlayerRender()
+    {
+        playerModel.GetComponent<Renderer>().enabled = true;
+        foreach (Renderer renderer in playerModel.GetComponentsInChildren<Renderer>())
+        {
+            renderer.enabled = true;
+        }
+    }
+
+
 
 }

@@ -22,7 +22,8 @@ public class PlayerCam : MonoBehaviour
     public bool canRotate = true;
 
     void Start()
-    {
+    {   
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -52,7 +53,7 @@ public class PlayerCam : MonoBehaviour
         }
         
 
-        if (Input.GetKey(playerMovement.crouchKey))
+        if (playerMovement.crouching)
         {
             camTrans.localPosition = Vector3.Lerp(
                 camTrans.localPosition,
@@ -72,11 +73,12 @@ public class PlayerCam : MonoBehaviour
 
     private void RotatePlayerCam()
     {
-        float mouseX = Input.GetAxis("Mouse X") * sensX * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * sensY * Time.deltaTime;
+        playerMovement.inputLook = Vector2.Lerp(playerMovement.inputLook, playerMovement.inputLookRaw, Time.deltaTime * 3f);
+        float mouseX = playerMovement.inputLook.x * sensX * Time.deltaTime;
+        float mouseY = playerMovement.inputLook.y * sensY * Time.deltaTime;
 
-        yRotation += mouseX;
-        xRotation -= mouseY;
+        yRotation += mouseX * 0.06f;
+        xRotation -= mouseY * 0.06f;
 
         //Clamp xRotation so the player can't look behind themselves
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);

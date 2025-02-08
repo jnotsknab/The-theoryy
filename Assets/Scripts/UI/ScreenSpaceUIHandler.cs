@@ -75,7 +75,7 @@ public class ScreenSpaceUIHandler : MonoBehaviour
 
         if (distance <= maxDistance)
         {
-            if (Input.GetKeyDown(interactKey) && uiPopup.activeSelf && !on)
+            if (Input.GetKeyDown(KeyCode.E) && uiPopup.activeSelf && !on)
             {
                 computerScreenHandler.TurnOnComputer();
                 uiPopup.SetActive(false);
@@ -83,7 +83,7 @@ public class ScreenSpaceUIHandler : MonoBehaviour
                 uiFilled = true; // Block other UIs
                 Debug.Log("Computer turned ON");
             }
-            else if (Input.GetKeyDown(interactKey) && on)
+            else if (Input.GetKeyDown(KeyCode.Tab) && on)
             {
                 computerScreenHandler.TurnOffComputer();
                 uiPopup.SetActive(false);

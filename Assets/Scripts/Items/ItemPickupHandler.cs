@@ -34,6 +34,9 @@ public class ItemPickupHandler : MonoBehaviour
     GameObject currentItem;
     GameObject item;
 
+    [Header("Item Data")]
+    public ItemData itemData;
+
 
     bool canPickup;
     public bool pickedUp = false;
@@ -138,14 +141,11 @@ public class ItemPickupHandler : MonoBehaviour
         StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(armAnimator, "ItemDropLayer", "FPSawedOffDrop"));
         StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(itemAnimator, "ItemDropLayer", "SawedOffDrop"));
         
-        
-
         //Wait before deactivating the item
         AnimatorStateInfo stateInfo = armAnimator.GetCurrentAnimatorStateInfo(armAnimator.GetLayerIndex("ItemDropLayer"));
         float animationLength = stateInfo.length;
         yield return new WaitForSeconds(animationLength);
         
-
         //Reset the animated item's animator and the animators of its children to ensure were in the correct state when the item is picked up again, then disable the item.
         if (itemAnimator.gameObject.activeSelf)
         {
@@ -218,11 +218,12 @@ public class ItemPickupHandler : MonoBehaviour
         currentItemName = currentItem.transform.name;
         Debug.Log($"EmptyPickupEventHandler called. item Name = {currentItemName}");
 
-        ItemData itemData = ItemManager.GetItemData(currentItemID);
+        //Fetch item data by the Item ID which is set based on the gameobject name in the PickupItemRoutine method.
+        itemData = ItemManager.GetItemData(currentItemID);
         Debug.Log($"Current Item ID {currentItemID}");
         if (itemData == null)
         {
-            Debug.LogError($"Failed to get ItemData for ID {currentItemID}. The item data is null.");
+            Debug.LogWarning($"Failed to get ItemData for ID {currentItemID}. The item data is null.");
             return;
         }
         StartCoroutine(OnItemPickupComplete(

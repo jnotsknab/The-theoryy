@@ -45,6 +45,10 @@ public class AudioHandler
 
         audioClips["SpawnLightOn"] = Resources.Load<AudioClip>("Assets/SFX/StaticSFX/SpawnLightSFXNew");
         audioClips["SpawnLightHum"] = Resources.Load<AudioClip>("Assets/SFX/StaticSFX/SpawnLampFlicker");
+        audioClips["SawedOffFire"] = Resources.Load<AudioClip>("Assets/SFX/ItemSFX/SawedOffFire");
+        audioClips["SawedOffLoad"] = Resources.Load<AudioClip>("Assets/SFX/ItemSFX/ShellLoad");
+        audioClips["SawedOffCock"] = Resources.Load<AudioClip>("Assets/SFX/ItemSFX/SawedOffCock");
+        audioClips["SawedOffEject"] = Resources.Load<AudioClip>("Assets/SFX/ItemSFX/ShellEject");
 
     }
 
@@ -124,8 +128,9 @@ public class AudioHandler
         AudioSource[] audioSources = targetObj.GetComponents<AudioSource>();
 
         foreach (AudioSource audioSource in audioSources)
-        {
-            CoroutineHelper.StartStaticCoroutine(FadeSource(audioSource, fadeIn, fadeDuration));
+        {   
+            //Fix This Eventually coroutine helper is fucked rn.
+            //CoroutineHelper.StartStaticCoroutine(FadeSource(audioSource, fadeIn, fadeDuration));
         }
     }
 

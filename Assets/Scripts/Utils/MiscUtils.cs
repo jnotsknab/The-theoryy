@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.Text;
 using UnityEngine;
 
 public class MiscUtils
@@ -29,13 +29,43 @@ public class MiscUtils
         return taggedObjects;
     }
 
+    public string RandomString(int length, bool allCaps = false, bool allLowercase = false, bool includeNums = true, bool includeSpecial = false)
+    {
+        if (length <= 0)
+        {
+            throw new ArgumentException("Length must be a positive integer.");
+        }
 
+        string lower = "abcdefghijklmnopqrstuvwxyz";
+        string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        string digits = "0123456789";
+        string special = "!@#$%^&*()-_=+[]{}|;:,.<>?/";
 
+        StringBuilder characterSet = new StringBuilder();
 
+        if (allCaps) characterSet.Append(upper);
+        if (allLowercase) characterSet.Append(lower);
+        if (includeNums) characterSet.Append(digits);
+        if (includeSpecial) characterSet.Append(special);
+
+        if (characterSet.Length == 0)
+        {
+            throw new ArgumentException("At least one character set (lowercase, uppercase, numbers, special) must be enabled.");
+        }
+
+        System.Random rand = new System.Random();
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < length; i++)
+        {
+            result.Append(characterSet[rand.Next(characterSet.Length)]);
+        }
+
+        return result.ToString();
+    }
 
     public Vector3 GetPlayerPosition(GameObject playerObj)
     {
-        
         if (playerObj != null)
         {
             return playerObj.transform.position;
@@ -46,4 +76,7 @@ public class MiscUtils
             return Vector3.zero;
         }
     }
+
+
 }
+

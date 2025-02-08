@@ -124,19 +124,9 @@ public class LightingController
             // Toggle the light's active state based on 'turnOn' parameter
             light.SetActive(turnOn);
 
-
-            //// Get the AudioSource component attached to the light
-            //AudioSource audioSource = light.GetComponent<AudioSource>();
-            //AudioClip clip1 = GetAudioClip("SpawnLightSFXNew");
-            //AudioClip clip2 = GetAudioClip("SpawnLampFlicker");
-            //audioSource.clip = player.spawnLightStartup;
-            //CoroutineRunner.Instance.RunCoroutine(PlayDelayedClip(audioSource, player.spawnLightHum, 0.25f));
-
-            audioHandler.PlaySources(light, true, true, 0.85f, 1.2f, 0.5f, 1f);
-            
-
             if (turnOn)
             {
+                audioHandler.PlaySources(light, true, true, 0.85f, 1.2f, 0.5f, 1f);
                 Debug.Log("Light was turned on");
             }
             else
@@ -151,18 +141,6 @@ public class LightingController
         }
     }
 
-    //public void LightFlicker(Vector3 lightPos, float minIntensity, float maxIntensity, float flickerSpeed)
-    //{
-    //    GameObject lightObj = lightObjs.FirstOrDefault(obj => Vector3.Distance(obj.transform.position, lightPos) < 0.1f);
-    //    if (lightObj != null)
-    //    {
-    //        Light lightComponent = lightObj.GetComponent<Light>();
-    //        if (lightComponent != null && !flickerTimers.ContainsKey(lightComponent))
-    //        {
-    //            flickerTimers[lightComponent] = 0f; // Initialize flicker timer
-    //        }
-    //    }
-    //}
 
     public void LightFlicker(Vector3 lightPos, float minInterval, float maxInterval, float minIntensity, float maxIntensity, float deltaTime)
     {

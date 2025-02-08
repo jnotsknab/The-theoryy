@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,14 +10,18 @@ public class PlayerMovement : MonoBehaviour
     public float crouchSpeed;
     public bool sprinting;
     public bool crouching;
+    public Vector2 inputLook;
+    public Vector2 inputLookRaw;
+    public Vector2 inputMove;
 
-
+    //Physics stuff
     public float groundDrag;
-
+    public float airDrag;
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
     bool readyToJump;
+    private bool jumpRequested = false;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -40,8 +44,6 @@ public class PlayerMovement : MonoBehaviour
     private Animator armAnimator;
     public Animator sawedOffAnimator;
 
-
-
     public Transform orientation;
     float horizontalInput;
     float verticalInput;
@@ -63,30 +65,42 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-
-        HandleMovement();
+        MyInput();
         HandleAnimations();
 
     }
 
     private void FixedUpdate()
     {
+        ManageMovement();
         MovePlayer();
-    }
 
-    private void MyInput()
-    {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
-
-        if (Input.GetKey(jumpKey) && readyToJump && grounded)
+        // Handle jump in FixedUpdate for consistent physics.
+        if (jumpRequested)
         {
-            readyToJump = false;
             Jump();
+            jumpRequested = false;
             Invoke(nameof(ResetJump), jumpCooldown);
         }
     }
 
+
+
+    private void MyInput()
+    {   
+        horizontalInput = inputMove.x;
+        verticalInput = inputMove.y;
+
+        if (Keyboard.current.spaceKey.isPressed && readyToJump && grounded)
+        {
+            readyToJump = false;
+            jumpRequested = true;
+        }
+    }
+    
+    /// <summary>
+    /// Handles the actual movement of the player by adding force to the player RigidBody. (called in FixedUpdate)
+    /// </summary>
     private void MovePlayer()
     {
         //Calc Move Direction
@@ -94,23 +108,20 @@ public class PlayerMovement : MonoBehaviour
 
         if (grounded)
         {   
-            if (Input.GetKey(sprintKey) && currentSprintTime > 0f)
+            if (IsSprinting() && currentSprintTime > 0f)
             {   
-                crouching = false;
-                sprinting = true;
-                rb.AddForce(moveDirection.normalized * sprintSpeed * 10f, ForceMode.Force);
+
+                rb.AddForce(moveDirection * sprintSpeed * 10f, ForceMode.Force);
             }
-            else if (Input.GetKey(crouchKey))
+            else if (IsCrouching())
             {   
-                sprinting = false;
-                crouching = true;
-                rb.AddForce(moveDirection.normalized * crouchSpeed * 10f, ForceMode.Force);
+
+                rb.AddForce(moveDirection * crouchSpeed * 10f, ForceMode.Force);
             }
             else
             {   
-                sprinting = false;
-                crouching = false;
-                rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+
+                rb.AddForce(moveDirection * moveSpeed * 10f, ForceMode.Force);
             }
             
 
@@ -146,6 +157,10 @@ public class PlayerMovement : MonoBehaviour
         readyToJump = true;
     }
 
+    /// <summary>
+    /// Makes the player fall faster.
+    /// </summary>
+    /// <param name="fallMultiplier"></param>
     private void ApplyFallMultiplier(float fallMultiplier)
     {
         if (rb.velocity.y < 0)
@@ -158,7 +173,6 @@ public class PlayerMovement : MonoBehaviour
     {
         armAnimator = GetComponentInChildren<Animator>();
         playerCamEffects = GetComponentInChildren<PlayerCamEffects>();
-        //sawedOffAnimator = transform.Find("SawedOff").GetComponent<Animator>();
     }
 
 
@@ -173,39 +187,27 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetFloat("Speed", 0f, 0.05f, Time.deltaTime);
         }
-        else if (moveDirection != Vector3.zero && !Input.GetKey(sprintKey))
+        else if (moveDirection != Vector3.zero && !IsSprinting())
         {
             animator.SetFloat("Speed", 0.5f, 0.05f, Time.deltaTime);
         }
-        else if (moveDirection != Vector3.zero && Input.GetKey(sprintKey) && currentSprintTime > 0)
+        else if (moveDirection != Vector3.zero && IsSprinting() && currentSprintTime > 0)
         {
             animator.SetFloat("Speed", 1f, 0.05f, Time.deltaTime);
         }
-        else if (moveDirection != Vector3.zero && Input.GetKey(sprintKey) && currentSprintTime <= 0)
+        else if (moveDirection != Vector3.zero && IsSprinting() && currentSprintTime <= 0)
         {
             animator.SetFloat("Speed", 0.5f, 0.05f, Time.deltaTime);
         }
     }
 
-    private void HandleMovement()
+    /// <summary>
+    /// Manages the playermovement and physics based operations. (called in FixedUpdate)
+    /// </summary>
+    private void ManageMovement()
     {
-        bool wasGrounded = grounded;
         grounded = Physics.CheckSphere(groundCheck.position, groundDistance, whatIsGround);
 
-        // Check if the player was in the air and has now landed
-        if (wasInAir && grounded)
-        {
-            //playerCamEffects.TriggerLandingEffect();
-            //wasInAir = false;
-        }
-        if (!grounded && !wasInAir)
-        {
-            wasInAir = true;  // Player has left the ground
-        }
-
-        
-
-        MyInput();
         SpeedControl();
 
         if (grounded)
@@ -214,19 +216,55 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            rb.drag = 0;
+            rb.drag = airDrag;
             ApplyFallMultiplier(1.75f);
         }
 
-        if (Input.GetKey(sprintKey) && currentSprintTime > 0f)
+        UpdateSprintUI();
+    }
+
+    public void OnMove(InputAction.CallbackContext value)
+    {
+        inputMove = value.ReadValue<Vector2>();
+    }
+
+    public void OnLook(InputAction.CallbackContext value)
+    {
+        inputLook = value.ReadValue<Vector2>();
+    }
+
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        crouching = context.ReadValue<float>() > 0;
+    }
+
+    public bool IsCrouching()
+    {
+        return crouching;
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        sprinting = context.ReadValue<float>() > 0;
+    }
+
+    public bool IsSprinting()
+    {   
+        return sprinting;
+    }
+
+    public void UpdateSprintUI()
+    {
+        if (IsSprinting() && currentSprintTime > 0f)
         {
             currentSprintTime -= Time.deltaTime; // Deplete sprint meter when sprinting
         }
-        else if (!Input.GetKey(sprintKey) && currentSprintTime < sprintDuration)
+        else if (!IsSprinting() && currentSprintTime < sprintDuration)
         {
             currentSprintTime += Time.deltaTime * regenSpeed; // Regenerate sprint meter when not sprinting
         }
     }
+
 
 
 }

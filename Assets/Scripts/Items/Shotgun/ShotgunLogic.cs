@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class ShotgunLogic : MonoBehaviour
 {   
@@ -36,17 +37,37 @@ public class ShotgunLogic : MonoBehaviour
     public float maxReloadTime;
     public float minReloadTime = 1f;
     public bool isReloading = false;
+    private bool knockBackRequested = false;
 
     private AnimationUtils animationUtils;
-    
+    private AudioHandler audioHandler = new AudioHandler();
+    private AudioSource[] audioSources;
+    private AudioSource fireSource;
+    private AudioSource ejectSource;
+    private AudioSource shellLoadSource;
+    private AudioSource rackSource;
+
+
     public Camera fpcam;
     public Rigidbody playerRigidbody;
     public float recoilForce = 10f;
 
 
-    
+    private void Awake()
+    {
+        animationUtils = gameObject.AddComponent<AnimationUtils>();
+        shotgunShotSFX = GetComponent<AudioSource>();
+    }
     private void Start()
     {   
+        //Fetch all audio sources on the gun.
+        GameObject sawedOffObj = GameObject.Find("SawedOff");
+        audioSources = audioHandler.GetAudioSources(sawedOffObj);
+        fireSource = audioSources[0];
+        ejectSource = audioSources[1];
+        shellLoadSource = audioSources[2];
+        rackSource = audioSources[3];
+
         shellBoreLeft = GetShellRef("ShellBoreLeft");
         shellBoreRight = GetShellRef("ShellBoreRight");
         shellHandLeft = GetShellRef("ShellHandLeft");
@@ -55,8 +76,7 @@ public class ShotgunLogic : MonoBehaviour
         //Set all shells to inactive until reload animation.
         ResetShells();
 
-        animationUtils = gameObject.AddComponent<AnimationUtils>();
-        shotgunShotSFX = GetComponent<AudioSource>();
+        
         currentAmmo = maxAmmo;
 
         // If the Rigidbody is not assigned in the inspector, try to find it automatically
@@ -82,25 +102,36 @@ public class ShotgunLogic : MonoBehaviour
     }
 
     void Update()
-    {   
+    {
 
         // Return if were reloading so multiple coroutines arent started.
         if (isReloading)
         {
             return;
         }
+        //Convert Reload to new input system
         if (currentAmmo <= 0 && Input.GetKeyDown(KeyCode.R))
-        {   
+        {
             StartCoroutine(Reload());
-            
+
             return;
         }
-        else if (Input.GetMouseButtonDown(0) && currentAmmo > 0)
-        {
-           
-            Shoot();
-        }
 
+    }
+
+    private void FixedUpdate()
+    {
+        if (knockBackRequested)
+        {   
+            knockBackRequested = false;
+            ApplyRecoil();
+        }
+    }
+
+    public void OnShoot(InputAction.CallbackContext context)
+    {
+        if (context.performed && currentAmmo > 0)
+            Shoot();
     }
 
 
@@ -144,11 +175,11 @@ public class ShotgunLogic : MonoBehaviour
         currentAmmo--;
 
         StartCoroutine(PlayFireAnimations());
-        shotgunShotSFX.Play();
+        audioHandler.PlaySource(fireSource, true, false, 0.95f, 1.05f, 1f, 1f);
         muzzleFlash.Play();
         StartCoroutine(screenShake.Shake(.15f, .3f));
 
-        ApplyRecoil();
+        knockBackRequested = true;
 
         for (int i = 0; i < numRays; i++)
         {
@@ -241,5 +272,20 @@ public class ShotgunLogic : MonoBehaviour
         shellBoreRightRenderer.enabled = true;
         shellHandLeftRenderer.enabled = true;
         shellHandRightRenderer.enabled = true;
+    }
+
+    public void EjectSFXEvent()
+    {
+        audioHandler.PlaySource(ejectSource, true, true, 0.95f, 1.05f, 0.5f, 0.75f);
+    }
+
+    public void ShellLoadSFXEvent()
+    {
+        audioHandler.PlaySource(shellLoadSource, true, true, 0.95f, 1.05f, 0.5f, 0.75f);
+    }
+
+    public void RackSFXEvent()
+    {
+        audioHandler.PlaySource(rackSource, true, true, 0.95f, 1.05f, 0.5f, 0.75f);
     }
 }

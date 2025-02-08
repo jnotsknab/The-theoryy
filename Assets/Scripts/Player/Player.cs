@@ -64,7 +64,7 @@ public class Player : MonoBehaviour
     {
         if (playerMovement.grounded && currentLocation == "SpawnRoom" && playerMovement.moveDirection != Vector3.zero)
         {
-            if (playerMovement.sprinting)
+            if (playerMovement.sprinting && playerMovement.currentSprintTime >= 0)
             {
                 if (Time.time - lastStepTime > stepSprintCooldown)
                 {
@@ -109,6 +109,7 @@ public class Player : MonoBehaviour
     private void PlayFootstepsSpawn()
     {
         AudioClip randomClip = playerFootstepSFX[Random.Range(0, playerFootstepSFX.Length)];
+        //Debug.Log("Footstep SFX count: " + playerFootstepSFX.Length);
 
         playerAudioSource.clip = randomClip;
         audioHandler.PlaySource(playerAudioSource, true, true, 0.85f, 1.15f, 0.75f, 1f);
@@ -119,7 +120,6 @@ public class Player : MonoBehaviour
     private void SpawnLightingEvents()
     {
         lightingController.EnableSpawnLightRange(spawnLightPositions, playerObject);
-        //lightingController.UpdateFlicker(Time.deltaTime);
     }
     private void OnTriggerEnter(Collider other)
     {

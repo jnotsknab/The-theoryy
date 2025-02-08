@@ -159,6 +159,23 @@ public class AnimationUtils : MonoBehaviour
         }
     }
 
+    public Animator GetAnimator(GameObject targetObject)
+    {
+        if (targetObject!= null)
+        {   
+            Animator animator = targetObject.GetComponent<Animator>();
+            if (animator == null)
+            {
+                Debug.LogError($"Animator component not found on {targetObject.transform.name} object.");
+            }
+            return animator;            
+        }
+
+        Debug.LogError("GetAnimator was called with a null targetObject");
+        return null;
+
+    }
+
 
 
 
