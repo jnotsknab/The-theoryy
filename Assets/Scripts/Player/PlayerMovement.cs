@@ -24,9 +24,6 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Physics Stuff")]
     Rigidbody rb;
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
     public float groundDrag;
 
@@ -36,12 +33,9 @@ public class PlayerMovement : MonoBehaviour
     bool readyToJump;
 
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
 
-=======
->>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     [Header("Ground Check")]
@@ -61,25 +55,16 @@ public class PlayerMovement : MonoBehaviour
     public float regenSpeed;
 
     [Header("Input Stuff")]
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
     public Transform orientation;
 
     float horizontalInput;
     float verticalInput;
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
     Vector3 moveDirection;
 
     Rigidbody rb;
-=======
-    
-    [Header("CamEffects")]
-    private PlayerCamEffects playerCamEffects;
->>>>>>> Stashed changes
 =======
     
     [Header("CamEffects")]
@@ -100,9 +85,6 @@ public class PlayerMovement : MonoBehaviour
 =======
         currentSprintTime = sprintDuration;
         
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
     }
 
@@ -110,7 +92,6 @@ public class PlayerMovement : MonoBehaviour
     {
         grounded = Physics.CheckSphere(groundCheck.position, groundDistance, whatIsGround);
         MyInput();
-<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         SpeedControl();
 
@@ -126,8 +107,6 @@ public class PlayerMovement : MonoBehaviour
             
         }
 
-=======
->>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     }
@@ -151,10 +130,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 =======
-=======
->>>>>>> Stashed changes
     private void GetRefs()
     {
         rb = GetComponent<Rigidbody>();
@@ -225,11 +201,8 @@ public class PlayerMovement : MonoBehaviour
     }
 
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
 =======
-=======
->>>>>>> Stashed changes
     /// <summary>
     /// Manages the playermovement and physics based operations. (called in FixedUpdate)
     /// </summary>
@@ -294,9 +267,6 @@ public class PlayerMovement : MonoBehaviour
             currentSprintTime += Time.deltaTime * regenSpeed; // Regenerate sprint meter when not sprinting
         }
     }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
 
 }
