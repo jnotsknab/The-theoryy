@@ -21,8 +21,19 @@ public class PlayerCam : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+<<<<<<< Updated upstream
         float mouseX = Input.GetAxis("Mouse X") * sensX * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensY * Time.deltaTime;
+=======
+        if (!stopFollowingPlayer)
+        {
+            camTrans.parent = transform;
+        }
+        else
+        {
+            camTrans.parent = null; 
+        }
+>>>>>>> Stashed changes
 
         yRotation += mouseX;
         xRotation -= mouseY;
