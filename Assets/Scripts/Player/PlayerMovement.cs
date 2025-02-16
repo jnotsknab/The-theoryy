@@ -1,11 +1,14 @@
-
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed;
+<<<<<<< Updated upstream
+
+=======
     public float sprintSpeed;
     public float crouchSpeed;
     public bool sprinting;
@@ -13,26 +16,43 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 inputLook;
     public Vector2 inputLookRaw;
     public Vector2 inputMove;
+    public Vector3 moveDirection;
 
-    //Physics stuff
+
+    public KeyCode sprintKey = KeyCode.LeftShift;
+    public KeyCode crouchKey = KeyCode.LeftControl;
+
+    [Header("Physics Stuff")]
+    Rigidbody rb;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     public float groundDrag;
-    public float airDrag;
+
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
     bool readyToJump;
-    private bool jumpRequested = false;
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode sprintKey = KeyCode.LeftShift;
-    public KeyCode crouchKey = KeyCode.LeftControl;
 
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     [Header("Ground Check")]
     public float playerHeight;
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask whatIsGround;
+<<<<<<< Updated upstream
+    bool grounded;
+
+=======
     public bool grounded;
 
     [Header("Sprint Meter")]
@@ -40,51 +60,106 @@ public class PlayerMovement : MonoBehaviour
     public float currentSprintTime;
     public float regenSpeed;
 
-    [Header("Animations")]
-    private Animator armAnimator;
-    public Animator sawedOffAnimator;
-
+    [Header("Input Stuff")]
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     public Transform orientation;
+
     float horizontalInput;
     float verticalInput;
-    public Vector3 moveDirection;
-    Rigidbody rb;
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
+    Vector3 moveDirection;
+
+    Rigidbody rb;
+=======
+    
     [Header("CamEffects")]
     private PlayerCamEffects playerCamEffects;
-    private bool wasInAir = false;
+>>>>>>> Stashed changes
+=======
+    
+    [Header("CamEffects")]
+    private PlayerCamEffects playerCamEffects;
+>>>>>>> Stashed changes
 
+
+    private void Awake()
+    {
+        GetRefs();
+    }
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        
         rb.freezeRotation = true;
         readyToJump = true;
+<<<<<<< Updated upstream
+=======
         currentSprintTime = sprintDuration;
-        GetRefs();
+        
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     }
 
     private void Update()
     {
+        grounded = Physics.CheckSphere(groundCheck.position, groundDistance, whatIsGround);
         MyInput();
-        HandleAnimations();
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+        SpeedControl();
 
+        if (grounded)
+        {
+            rb.drag = groundDrag;
+
+        }
+        else
+        {
+            rb.drag = 0;
+            ApplyFallMultiplier(1.75f);
+            
+        }
+
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     }
 
     private void FixedUpdate()
     {
-        ManageMovement();
         MovePlayer();
+    }
 
-        // Handle jump in FixedUpdate for consistent physics.
-        if (jumpRequested)
+    private void MyInput()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
+
+        if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
+            readyToJump = false;
             Jump();
-            jumpRequested = false;
             Invoke(nameof(ResetJump), jumpCooldown);
         }
     }
 
-
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+=======
+>>>>>>> Stashed changes
+    private void GetRefs()
+    {
+        rb = GetComponent<Rigidbody>();
+        playerCamEffects = GetComponentInChildren<PlayerCamEffects>();
+    }
 
     private void MyInput()
     {   
@@ -101,37 +176,21 @@ public class PlayerMovement : MonoBehaviour
     /// <summary>
     /// Handles the actual movement of the player by adding force to the player RigidBody. (called in FixedUpdate)
     /// </summary>
+>>>>>>> Stashed changes
     private void MovePlayer()
     {
         //Calc Move Direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         if (grounded)
-        {   
-            if (IsSprinting() && currentSprintTime > 0f)
-            {   
-
-                rb.AddForce(moveDirection * sprintSpeed * 10f, ForceMode.Force);
-            }
-            else if (IsCrouching())
-            {   
-
-                rb.AddForce(moveDirection * crouchSpeed * 10f, ForceMode.Force);
-            }
-            else
-            {   
-
-                rb.AddForce(moveDirection * moveSpeed * 10f, ForceMode.Force);
-            }
-            
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
 
         }
         else if (!grounded)
         {
                rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
         }
-
-
     }
 
     private void SpeedControl()
@@ -157,10 +216,6 @@ public class PlayerMovement : MonoBehaviour
         readyToJump = true;
     }
 
-    /// <summary>
-    /// Makes the player fall faster.
-    /// </summary>
-    /// <param name="fallMultiplier"></param>
     private void ApplyFallMultiplier(float fallMultiplier)
     {
         if (rb.velocity.y < 0)
@@ -169,38 +224,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void GetRefs()
-    {
-        armAnimator = GetComponentInChildren<Animator>();
-        playerCamEffects = GetComponentInChildren<PlayerCamEffects>();
-    }
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
-
-    private void HandleAnimations()
-    {
-        UpdateAnimator(armAnimator);
-        UpdateAnimator(sawedOffAnimator);
-    }
-    private void UpdateAnimator(Animator animator)
-    {
-        if (moveDirection == Vector3.zero)
-        {
-            animator.SetFloat("Speed", 0f, 0.05f, Time.deltaTime);
-        }
-        else if (moveDirection != Vector3.zero && !IsSprinting())
-        {
-            animator.SetFloat("Speed", 0.5f, 0.05f, Time.deltaTime);
-        }
-        else if (moveDirection != Vector3.zero && IsSprinting() && currentSprintTime > 0)
-        {
-            animator.SetFloat("Speed", 1f, 0.05f, Time.deltaTime);
-        }
-        else if (moveDirection != Vector3.zero && IsSprinting() && currentSprintTime <= 0)
-        {
-            animator.SetFloat("Speed", 0.5f, 0.05f, Time.deltaTime);
-        }
-    }
-
+=======
+=======
+>>>>>>> Stashed changes
     /// <summary>
     /// Manages the playermovement and physics based operations. (called in FixedUpdate)
     /// </summary>
@@ -253,6 +282,7 @@ public class PlayerMovement : MonoBehaviour
         return sprinting;
     }
 
+    //Move this to its own player UI class soon
     public void UpdateSprintUI()
     {
         if (IsSprinting() && currentSprintTime > 0f)
@@ -264,7 +294,9 @@ public class PlayerMovement : MonoBehaviour
             currentSprintTime += Time.deltaTime * regenSpeed; // Regenerate sprint meter when not sprinting
         }
     }
-
-
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 
 }

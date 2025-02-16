@@ -77,6 +77,25 @@ public class MiscUtils
         }
     }
 
+    public bool DistCheck(Camera playerCam, GameObject item, int maxDist, int fieldOfView)
+    {
+        Vector3 directionToItem = item.transform.position - playerCam.transform.position;
 
+        if (directionToItem.sqrMagnitude > maxDist * maxDist)
+        {
+            return false;
+        }
+
+        Vector3 forward = playerCam.transform.forward;
+        float dot = Vector3.Dot(forward, directionToItem.normalized);
+
+        float maxDot = Mathf.Cos(Mathf.Deg2Rad * fieldOfView);
+        if (dot < maxDot)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
 

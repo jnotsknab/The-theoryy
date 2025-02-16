@@ -93,7 +93,7 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Height: 250
-    - _Intensity: 0.5
+    - _Intensity: 0
     - _Lcd: 1
     - _Metallic: 0
     - _Mode: 0

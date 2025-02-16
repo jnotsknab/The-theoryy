@@ -84,25 +84,24 @@ public class LightingController
     public void EnableSpawnLightRange(Vector3[] lightPositions, GameObject playerObj)
     {
         Vector3 playerPos = miscUtils.GetPlayerPosition(playerObj);
-        Debug.Log($"Player pos: {playerPos}");
+        
+        //Causes GC alloc as this debug statement was being called every frame.
+        //Debug.Log($"Player pos: {playerPos}");
         
 
-        // Iterate over all light positions
         foreach (Vector3 lightPos in lightPositions)
         {
             float distance = Vector3.Distance(playerPos, lightPos);
 
-            // If the light is within range and isn't already activated, turn it on
             if (distance <= playerDetectionRadius && !activeLights.Contains(lightPos))
             {
-                ToggleLight(lightPos, true);  // Turn on light
+                ToggleLight(lightPos, true);
                 activeLights.Add(lightPos);  // Mark the light as active
 
             }
-            // If the light is out of range and is active, turn it off
             else if (distance > playerDetectionRadius && activeLights.Contains(lightPos))
             {
-                ToggleLight(lightPos, false); // Turn off light
+                ToggleLight(lightPos, false);
                 activeLights.Remove(lightPos); // Mark the light as inactive
                 
             }
@@ -164,7 +163,7 @@ public class LightingController
             if (flickerTimers[light] >= flickerIntervals[light]) // Only update when timer exceeds interval
             {
                 light.intensity = UnityEngine.Random.Range(minIntensity, maxIntensity);
-                Debug.Log($"Light intensity updated to {light.intensity}");
+                //Debug.Log($"Light intensity updated to {light.intensity}");
 
                 flickerTimers[light] = 0f; // Reset timer
                 flickerIntervals[light] = UnityEngine.Random.Range(minInterval, maxInterval); // Assign new interval

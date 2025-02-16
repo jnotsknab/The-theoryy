@@ -24,11 +24,6 @@ public class ItemPickupHandler : MonoBehaviour
     public Animator armAnimator; // Animator for the player's arms
     public Animator gunAnimator; // Animator for the gun/item
     private static readonly int PickupTrigger = Animator.StringToHash("EmptyPickup");
-    private static readonly int EmptyState = Animator.StringToHash("Empty");
-    private static readonly int DropTrigger = Animator.StringToHash("Drop");
-    //private static readonly int EquipTrigger = Animator.StringToHash("Equip");
-    private static readonly int EquipBool = Animator.StringToHash("HasEquipped");
-
     private AnimationUtils animationUtils;
 
     GameObject currentItem;
@@ -74,7 +69,7 @@ public class ItemPickupHandler : MonoBehaviour
     }
 
     private void CheckItems()
-    {
+    {   
         RaycastHit hit;
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, maxPickupDist))
         {
@@ -138,8 +133,8 @@ public class ItemPickupHandler : MonoBehaviour
 
     private IEnumerator DropItemRoutine(Animator armAnimator, Animator itemAnimator, string layer, string itemAnim, string armAnim)
     {
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(armAnimator, "ItemDropLayer", "FPSawedOffDrop"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(itemAnimator, "ItemDropLayer", "SawedOffDrop"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(armAnimator, "ItemDropLayer", "FPSawedOffDrop"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(itemAnimator, "ItemDropLayer", "SawedOffDrop"));
         
         //Wait before deactivating the item
         AnimatorStateInfo stateInfo = armAnimator.GetCurrentAnimatorStateInfo(armAnimator.GetLayerIndex("ItemDropLayer"));
@@ -195,7 +190,7 @@ public class ItemPickupHandler : MonoBehaviour
         itemAnimator.gameObject.SetActive(true);
         
         // Start the pickup animation on the armAnimator and wait for it to finish
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(armAnimator, pickupLayer, pickupAnimation));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(armAnimator, pickupLayer, pickupAnimation));
 
         // Wait for the pickup animation to finish
         AnimatorStateInfo stateInfo = armAnimator.GetCurrentAnimatorStateInfo(armAnimator.GetLayerIndex(pickupLayer));
@@ -203,8 +198,8 @@ public class ItemPickupHandler : MonoBehaviour
         yield return new WaitForSeconds(animationLength);
 
         // Start the movement animations on both the armAnimator and gunAnimator
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(armAnimator, movementLayer, movementAnimation));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(itemAnimator, movementLayer, movementAnimation));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(armAnimator, movementLayer, movementAnimation));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(itemAnimator, movementLayer, movementAnimation));
 
         Debug.Log($"Animation event triggered: {pickupAnimation} equipped!");
     }

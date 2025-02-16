@@ -5,19 +5,19 @@ using UnityEngine;
 public class AnimationUtils : MonoBehaviour
 {   
     /// <summary>
-    /// Swaps to a layer and flips weights for all layers
+    /// Takes an animator, layer, and animation then sets the weight of the layer to 1 and all other layers 0, then the animation is played.
     /// </summary>
     /// <param name="animator"></param>
     /// <param name="layerName"></param>
     /// <param name="animationName"></param>
     
-    public IEnumerator SwapToLayerAndPlayEntryAnimation(Animator animator, string layerName, string animationName)
+    public IEnumerator SwapToLayerAndPlayAnimation(Animator animator, string layerName, string animationName)
     {
         int layerIndex = animator.GetLayerIndex(layerName);
 
         if (layerIndex == -1)
         {
-            Debug.LogError($"Layer '{layerName}' not found in Animator!");
+            Debug.LogError($"Layer '{layerName}' not found in Animator!: {animator.name}");
             yield break;
         }
 

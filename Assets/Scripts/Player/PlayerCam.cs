@@ -8,77 +8,35 @@ public class PlayerCam : MonoBehaviour
     public float sensY;
 
     public Transform orientation;
-    public PlayerMovement playerMovement;
 
-    public Transform camTrans;
-    public Vector3 crouchingCamPos;
-    public Vector3 standingCamPos;
-    public float crouchingTranSpeed;
-    public bool stopFollowingPlayer = false; // Add this bool to toggle camera follow
-
-    public float xRotation;
-    public float yRotation;
-
-    public bool canRotate = true;
+    float xRotation;
+    float yRotation;
 
     void Start()
-    {   
-
+    {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        if (standingCamPos == Vector3.zero)
-        {
-            standingCamPos = camTrans.localPosition;
-        }
-        
-        crouchingCamPos = new Vector3(standingCamPos.x, standingCamPos.y - 2f, standingCamPos.z);
     }
 
     // Update is called once per frame
     void Update()
     {
+<<<<<<< Updated upstream
+        float mouseX = Input.GetAxis("Mouse X") * sensX * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * sensY * Time.deltaTime;
+=======
         if (!stopFollowingPlayer)
         {
-            camTrans.parent = transform; // Ensure camera follows player
+            camTrans.parent = transform;
         }
         else
         {
-            camTrans.parent = null; // Detach camera from player
+            camTrans.parent = null; 
         }
+>>>>>>> Stashed changes
 
-        if (canRotate)
-        {
-            RotatePlayerCam();
-        }
-        
-
-        if (playerMovement.crouching)
-        {
-            camTrans.localPosition = Vector3.Lerp(
-                camTrans.localPosition,
-                crouchingCamPos,
-                crouchingTranSpeed * Time.deltaTime
-            );
-        }
-        else
-        {
-            camTrans.localPosition = Vector3.Lerp(
-                camTrans.localPosition,
-                standingCamPos,
-                crouchingTranSpeed * Time.deltaTime
-            );
-        }
-    }
-
-    private void RotatePlayerCam()
-    {
-        playerMovement.inputLook = Vector2.Lerp(playerMovement.inputLook, playerMovement.inputLookRaw, Time.deltaTime * 3f);
-        float mouseX = playerMovement.inputLook.x * sensX * Time.deltaTime;
-        float mouseY = playerMovement.inputLook.y * sensY * Time.deltaTime;
-
-        yRotation += mouseX * 0.06f;
-        xRotation -= mouseY * 0.06f;
+        yRotation += mouseX;
+        xRotation -= mouseY;
 
         //Clamp xRotation so the player can't look behind themselves
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
@@ -86,6 +44,5 @@ public class PlayerCam : MonoBehaviour
         //Rotate the camera and the orientation to the new rotation
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
         orientation.rotation = Quaternion.Euler(0, yRotation, 0);
-
     }
 }

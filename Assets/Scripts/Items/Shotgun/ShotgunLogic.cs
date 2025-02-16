@@ -47,6 +47,8 @@ public class ShotgunLogic : MonoBehaviour
     private AudioSource shellLoadSource;
     private AudioSource rackSource;
 
+    public GameObject sawedOffObj;
+
 
     public Camera fpcam;
     public Rigidbody playerRigidbody;
@@ -61,7 +63,6 @@ public class ShotgunLogic : MonoBehaviour
     private void Start()
     {   
         //Fetch all audio sources on the gun.
-        GameObject sawedOffObj = GameObject.Find("SawedOff");
         audioSources = audioHandler.GetAudioSources(sawedOffObj);
         fireSource = audioSources[0];
         ejectSource = audioSources[1];
@@ -135,6 +136,7 @@ public class ShotgunLogic : MonoBehaviour
     }
 
 
+    //Fix this later ts inefficient
     private GameObject GetShellRef(string shellName)
     {
         // Attempt to find the GameObject with the specified name
@@ -228,8 +230,8 @@ public class ShotgunLogic : MonoBehaviour
     private IEnumerator PlayFireAnimations()
     {
         // Start both animation coroutines
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(playerAnimator, "ShootLayer", "FPSawedOffShoot"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(sawedOffAnimator, "ShootLayer", "SawedOffShoot"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(playerAnimator, "ShootLayer", "FPSawedOffShoot"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(sawedOffAnimator, "ShootLayer", "SawedOffShoot"));
         yield return new WaitForSeconds(3);
         
     }
@@ -239,12 +241,12 @@ public class ShotgunLogic : MonoBehaviour
 
         ActivateShells();
 
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellBoreLeftAnimator, "ShellBoreLeftLayer", "ShellBoreLeftReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellBoreRightAnimator, "ShellBoreRightLayer", "ShellBoreRightReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellHandLeftAnimator, "ShellHandLeftLayer", "ShellHandLeftReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellHandRightAnimator, "ShellHandRightLayer", "ShellHandRightReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(playerAnimator, "ReloadLayer", "FPSawedOffReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(sawedOffAnimator, "ReloadLayer", "SawedOffReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellBoreLeftAnimator, "ShellBoreLeftLayer", "ShellBoreLeftReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellBoreRightAnimator, "ShellBoreRightLayer", "ShellBoreRightReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellHandLeftAnimator, "ShellHandLeftLayer", "ShellHandLeftReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellHandRightAnimator, "ShellHandRightLayer", "ShellHandRightReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(playerAnimator, "ReloadLayer", "FPSawedOffReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(sawedOffAnimator, "ReloadLayer", "SawedOffReload"));
         yield return null;
     }
 

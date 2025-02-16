@@ -3,13 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Item
-  - PlayerObject
-  - SpawnLight
-  - LocationZone
-  - PlayerSelf
-  - Computer
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -24,18 +18,18 @@ TagManager:
   - GlobalLighting
   - ComputerUI
   - NoBloomPostPr
+<<<<<<< Updated upstream
+  - 
+  - 
+  - 
+=======
   - Items
   - GroundedItems
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - StaticObjInteraction
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
   - 
   - 
   - 
