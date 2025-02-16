@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ComputerScreenHandler : MonoBehaviour
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 {
     public TextMeshProUGUI computerDisplay;
     public GameObject subScreenLight;
@@ -26,6 +27,14 @@ public class ComputerScreenHandler : MonoBehaviour
 
     [Header("Display Stuff")]
     public TextMeshProUGUI computerDisplay;
+=======
+{   
+    [SerializeField] ComputerCommandHandler commandHandler;
+    [SerializeField] AudioHandler audioHandler = new AudioHandler();
+
+    [Header("Display Stuff")]
+    public TextMeshProUGUI computerDisplay;
+>>>>>>> Stashed changes
     private GameObject computerHolder;
     public GameObject turnOffUI;
     public GameObject hudViewPanel;
@@ -62,6 +71,7 @@ public class ComputerScreenHandler : MonoBehaviour
     private void Awake()
     {
         if (screenMat != null)
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
         {
             screenMat.SetFloat("_Intensity", 0f);
@@ -69,6 +79,11 @@ public class ComputerScreenHandler : MonoBehaviour
 <<<<<<< Updated upstream
         screenEmissiveMaterial.DisableKeyword("_EMISSION");
 =======
+=======
+        {
+            screenMat.SetFloat("_Intensity", 0f);
+        }
+>>>>>>> Stashed changes
         else
         {
             Debug.LogError("Material for computer screen is null or has not been assigned.");
@@ -76,6 +91,9 @@ public class ComputerScreenHandler : MonoBehaviour
         
         GetRefs();
         DisableComputerAudio();
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
         //Disable all screens except for bootup screen
@@ -85,7 +103,10 @@ public class ComputerScreenHandler : MonoBehaviour
         
     }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     private void GetRefs()
     {
         computerHolder = GameObject.FindGameObjectWithTag("Computer");
@@ -101,6 +122,7 @@ public class ComputerScreenHandler : MonoBehaviour
         if (!isTurnedOn)
             return;
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         foreach (char c in Input.inputString)
         {
@@ -267,6 +289,118 @@ public class ComputerScreenHandler : MonoBehaviour
         }
     }
 
+=======
+        if (commandHandler.terminalText.enabled)
+        {
+            MainTerminalInput();
+        }
+        else if (commandHandler.logText.enabled)
+        {
+            LogInput();
+        }
+        else if (commandHandler.shopText.enabled)
+        {
+            ShopInput();
+        }
+        else if (commandHandler.upgradeText.enabled)
+        {
+            UpgradesInput();
+        }
+        else if (commandHandler.timeMachineText.enabled)
+        {
+            TimeMachineInput();
+        }
+        else if (commandHandler.bestiaryText.enabled)
+        {
+            BestiaryInput();
+        }
+
+        //TestTerminal();
+
+    }
+
+    private IEnumerator BootUpSequence()
+    {   
+
+        foreach (string message in bootMessages)
+        {
+            // Clear the screen before displaying the next message
+            commandHandler.bootText.text = "";
+
+            // Show the typing animation for the message
+            yield return StartCoroutine(TypeText(message));
+
+            // Pause for a short time before transitioning to the next message
+            yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
+        }
+        yield return new WaitForSeconds(0.5f);
+        DisableScreen(commandHandler.bootText);
+
+        //Testing for now later just call another coroutine here that activates the terminal.
+        //Current bug, if player turns computer off before this routine finishes the terminal text will be activated even if the computer is off.
+        EnableScreen(commandHandler.terminalText);
+        
+
+
+    }
+
+    private IEnumerator TypeText(string message)
+    {
+        foreach (char letter in message)
+        {
+            commandHandler.bootText.text = commandHandler.bootText.text.TrimEnd('_') + letter + "_"; // Keep cursor at the end
+            yield return new WaitForSeconds(0.022f);
+        }
+    }
+
+
+
+    public void TurnOnComputer()
+    {
+        if (!isTurnedOn)
+        {   
+            hudViewPanel.SetActive(false);
+            turnOffUI.SetActive(true);
+            computerLight.SetActive(true);
+            commandHandler.terminalText.enabled = false;
+            EnableScreen(commandHandler.bootText);
+            StartCoroutine(BootUpSequence());
+            screenMat.SetFloat("_Intensity", 0.5f);
+            camTransitionHandler.StartSwitchToTargetCam(.6f);
+            computerSFXSource.enabled = true;
+            computerSFXSource.clip = powerOnClip;
+            computerSFXSource.Play();
+
+            isTurnedOn = true;
+            computerDisplay.text = "";
+        }
+        
+    }
+
+    public void TurnOffComputer()
+    {   
+        if (isTurnedOn)
+        {   
+            hudViewPanel.SetActive(true);
+            turnOffUI.SetActive(false);
+            computerLight.SetActive(false);
+
+            screenMat.SetFloat("_Intensity", 0f);
+            camTransitionHandler.StartSwitchToPlayerCam(.6f);
+
+            computerSFXSource.clip = powerOffClip;
+            computerSFXSource.Play();
+
+            isTurnedOn = false;
+            computerDisplay.text = "";
+
+            //Ensures we dont cut off the turn off audio before it finishes.
+            Invoke(nameof(DisableComputerAudio), computerSFXSource.clip.length);
+            DisableAllScreens();
+        }
+    }
+
+>>>>>>> Stashed changes
 
     private IEnumerator CursorBlink()
     {
@@ -380,5 +514,8 @@ public class ComputerScreenHandler : MonoBehaviour
             }
         }
     }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }
