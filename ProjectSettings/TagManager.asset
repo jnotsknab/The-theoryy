@@ -11,25 +11,16 @@ TagManager:
   - 
   - Water
   - UI
-  - Player
-  - whatIsGround
-  - whatIsInteractable
-  - PostProcessing
-  - GlobalLighting
-  - ComputerUI
-  - NoBloomPostPr
-<<<<<<< Updated upstream
   - 
   - 
   - 
-=======
-  - Items
-  - GroundedItems
-  - StaticObjInteraction
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 
