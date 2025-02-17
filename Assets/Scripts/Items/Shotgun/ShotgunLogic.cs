@@ -4,8 +4,8 @@ using System.Collections;
 using UnityEngine.InputSystem;
 
 public class ShotgunLogic : MonoBehaviour
-{   
-    public ItemPickupHandler itemPickupHandler;
+{
+    //public ItemPickupHandler itemPickupHandler;
     public VisualEffect muzzleFlash;
     public AudioSource shotgunShotSFX;
     public ScreenShake screenShake;
@@ -47,6 +47,8 @@ public class ShotgunLogic : MonoBehaviour
     private AudioSource shellLoadSource;
     private AudioSource rackSource;
 
+    public GameObject sawedOffObj;
+
 
     public Camera fpcam;
     public Rigidbody playerRigidbody;
@@ -59,9 +61,8 @@ public class ShotgunLogic : MonoBehaviour
         shotgunShotSFX = GetComponent<AudioSource>();
     }
     private void Start()
-    {   
+    {
         //Fetch all audio sources on the gun.
-        GameObject sawedOffObj = GameObject.Find("SawedOff");
         audioSources = audioHandler.GetAudioSources(sawedOffObj);
         fireSource = audioSources[0];
         ejectSource = audioSources[1];
@@ -76,7 +77,7 @@ public class ShotgunLogic : MonoBehaviour
         //Set all shells to inactive until reload animation.
         ResetShells();
 
-        
+
         currentAmmo = maxAmmo;
 
         // If the Rigidbody is not assigned in the inspector, try to find it automatically
@@ -122,7 +123,7 @@ public class ShotgunLogic : MonoBehaviour
     private void FixedUpdate()
     {
         if (knockBackRequested)
-        {   
+        {
             knockBackRequested = false;
             ApplyRecoil();
         }
@@ -135,6 +136,7 @@ public class ShotgunLogic : MonoBehaviour
     }
 
 
+    //Fix this later ts inefficient
     private GameObject GetShellRef(string shellName)
     {
         // Attempt to find the GameObject with the specified name
@@ -153,7 +155,7 @@ public class ShotgunLogic : MonoBehaviour
     }
 
     IEnumerator Reload()
-    {   
+    {
         Debug.Log("Reloading...");
         isReloading = true;
 
@@ -161,7 +163,7 @@ public class ShotgunLogic : MonoBehaviour
 
         yield return new WaitForSeconds(maxReloadTime);
         //ResetShells();
-        
+
         currentAmmo = maxAmmo;
         isReloading = false;
     }
@@ -177,7 +179,7 @@ public class ShotgunLogic : MonoBehaviour
         StartCoroutine(PlayFireAnimations());
         audioHandler.PlaySource(fireSource, true, false, 0.95f, 1.05f, 1f, 1f);
         muzzleFlash.Play();
-        StartCoroutine(screenShake.Shake(.15f, .3f));
+        StartCoroutine(screenShake.Shake(.3f, 4f));
 
         knockBackRequested = true;
 
@@ -228,10 +230,10 @@ public class ShotgunLogic : MonoBehaviour
     private IEnumerator PlayFireAnimations()
     {
         // Start both animation coroutines
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(playerAnimator, "ShootLayer", "FPSawedOffShoot"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(sawedOffAnimator, "ShootLayer", "SawedOffShoot"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(playerAnimator, "ShootLayer", "FPSawedOffShoot"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(sawedOffAnimator, "ShootLayer", "SawedOffShoot"));
         yield return new WaitForSeconds(3);
-        
+
     }
 
     private IEnumerator PlayReloadAnimations()
@@ -239,22 +241,22 @@ public class ShotgunLogic : MonoBehaviour
 
         ActivateShells();
 
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellBoreLeftAnimator, "ShellBoreLeftLayer", "ShellBoreLeftReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellBoreRightAnimator, "ShellBoreRightLayer", "ShellBoreRightReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellHandLeftAnimator, "ShellHandLeftLayer", "ShellHandLeftReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(shellHandRightAnimator, "ShellHandRightLayer", "ShellHandRightReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(playerAnimator, "ReloadLayer", "FPSawedOffReload"));
-        StartCoroutine(animationUtils.SwapToLayerAndPlayEntryAnimation(sawedOffAnimator, "ReloadLayer", "SawedOffReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellBoreLeftAnimator, "ShellBoreLeftLayer", "ShellBoreLeftReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellBoreRightAnimator, "ShellBoreRightLayer", "ShellBoreRightReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellHandLeftAnimator, "ShellHandLeftLayer", "ShellHandLeftReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(shellHandRightAnimator, "ShellHandRightLayer", "ShellHandRightReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(playerAnimator, "ReloadLayer", "FPSawedOffReload"));
+        StartCoroutine(animationUtils.SwapToLayerAndPlayAnimation(sawedOffAnimator, "ReloadLayer", "SawedOffReload"));
         yield return null;
     }
 
     public void ResetToMovementState()
     {
-        
+
         //Fix transition between end of fire animation to movement animation as its hella jerky right now.
         StartCoroutine(animationUtils.ActivateLayer(playerAnimator, "ItemMovementLayer"));
         StartCoroutine(animationUtils.ActivateLayer(sawedOffAnimator, "ItemMovementLayer"));
-        
+
     }
 
     public void ResetShells()

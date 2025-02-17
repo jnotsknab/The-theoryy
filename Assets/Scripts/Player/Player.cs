@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// The Player class manages the player's movement, health, audio events, lighting, and interactions with the environment.
+/// It handles footstep sounds based on the player's movement and location, spawn lighting, and the whether player movement is enabled.
+/// </summary>
 public class Player : MonoBehaviour
 {
 

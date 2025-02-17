@@ -52,6 +52,16 @@ public class AudioHandler
 
     }
 
+    /// <summary>
+    /// Plays all the audiosources of a given GameObject.
+    /// </summary>
+    /// <param name="sourceObj"></param>
+    /// <param name="randPitch"></param>
+    /// <param name="randVolume"></param>
+    /// <param name="pitchMin"></param>
+    /// <param name="pitchMax"></param>
+    /// <param name="volMin"></param>
+    /// <param name="volMax"></param>
     public void PlaySources(GameObject sourceObj, bool randPitch, bool randVolume, float pitchMin, float pitchMax, float volMin, float volMax)
     {
         AudioSource[] audioSources = GetAudioSources(sourceObj);
@@ -77,6 +87,7 @@ public class AudioHandler
 
     }
 
+    //Fades dont work its fucked fix it later.
     public IEnumerator FadeSource(AudioSource audioSource, bool fadeIn = false, float fadeDuration = 10f)
     {
         if (!fadeIn)

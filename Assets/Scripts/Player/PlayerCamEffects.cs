@@ -5,18 +5,18 @@ using UnityEngine;
 public class PlayerCamEffects : MonoBehaviour
 {
     public PlayerMovement playerMovement;
-    public float walkBobSpeed = 8f; // Bob speed when walking
+    public float walkBobSpeed = 8f;
     public float crouchBobSpeed = 3f;
-    public float sprintBobSpeed = 14f; // Bob speed when sprinting
-    public float bobAmount = 0.3f; // How much the camera moves up and down
-    public float returnSpeed = 5f; // Speed at which the camera returns to default position when idle
-    public float landingBobAmount = 0.75f; // How much the camera moves down when landing
-    public float landingBobSpeed = 10f; // Speed of the landing bob effect
+    public float sprintBobSpeed = 14f; 
+    public float bobAmount = 0.3f;
+    public float returnSpeed = 5f; 
+    public float landingBobAmount = 0.75f;
+    public float landingBobSpeed = 10f; 
 
     private float defaultYPosition;
     private float timer = 0f;
     private float currentYPosition;
-    public bool isLanding = false; // Flag to track landing state
+    public bool isLanding = false;
     
 
     void Start()
@@ -31,12 +31,11 @@ public class PlayerCamEffects : MonoBehaviour
         {
             float bobSpeed;
 
-            // Determine the bob speed based on the player's state
-            if (Input.GetKey(playerMovement.crouchKey))
+            if (playerMovement.IsCrouching())
             {
                 bobSpeed = crouchBobSpeed;
             }
-            else if (Input.GetKey(playerMovement.sprintKey))
+            else if (playerMovement.IsSprinting())
             {
                 bobSpeed = sprintBobSpeed;
             }
@@ -45,7 +44,6 @@ public class PlayerCamEffects : MonoBehaviour
                 bobSpeed = walkBobSpeed;
             }
 
-            // If landing, apply downward bob effect
             if (isLanding)
             {
                 currentYPosition = defaultYPosition - Mathf.PingPong(Time.time * landingBobSpeed, landingBobAmount);

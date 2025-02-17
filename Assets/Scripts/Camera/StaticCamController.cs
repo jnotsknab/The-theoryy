@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class StaticCamController : MonoBehaviour
 {
-    //public Transform orientation;
 
     public float sensX;
     public float sensY;
@@ -13,14 +12,12 @@ public class StaticCamController : MonoBehaviour
 
     public bool canRotateStatic = false;
 
-    // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (canRotateStatic)

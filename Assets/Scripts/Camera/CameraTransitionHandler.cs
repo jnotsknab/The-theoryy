@@ -16,7 +16,6 @@ public class CameraTransitionHandler : MonoBehaviour
     public GameObject pill;
 
     [Header("Items and Item Logic")]
-    private ItemPickupHandler itemPickupHandler;
     public GameObject sawedOff;
     private ShotgunLogic shotgunLogic;
 
@@ -27,7 +26,6 @@ public class CameraTransitionHandler : MonoBehaviour
 
     private void Start()
     {
-        itemPickupHandler = player.GetComponent<ItemPickupHandler>();
         
         //Shotgun Logic needed to disable the renderer on the shotgun shells after we enable all renderers attached to the player.
         //Shitty solution should find a more scaleable fix in the future.

@@ -11,7 +11,7 @@ public class AnimationUtils : MonoBehaviour
     /// <param name="layerName"></param>
     /// <param name="animationName"></param>
     
-    public IEnumerator SwapToLayerAndPlayEntryAnimation(Animator animator, string layerName, string animationName)
+    public IEnumerator SwapToLayerAndPlayAnimation(Animator animator, string layerName, string animationName)
     {
         int layerIndex = animator.GetLayerIndex(layerName);
 
@@ -103,13 +103,11 @@ public class AnimationUtils : MonoBehaviour
             yield return null;
         }
 
-        // Reset all layers to weight 0
         for (int i = 0; i < animator.layerCount; i++)
         {
             animator.SetLayerWeight(i, 0f);
         }
 
-        // Set the target layer weight to 1 to activate it
         animator.SetLayerWeight(layerIndex, 1f);
     }
 
@@ -123,30 +121,25 @@ public class AnimationUtils : MonoBehaviour
             yield return null;
         }
 
-        // Reset all layers to weight 0
         for (int i = 0; i < animator.layerCount; i++)
         {
             animator.SetLayerWeight(i, 0f);
         }
 
-        // Gradually lerp the layer's weight from 0 to 1
         float elapsedTime = 0f;
         float startWeight = animator.GetLayerWeight(layerIndex);
         float targetWeight = 1f;
 
         while (elapsedTime < duration)
         {
-            // Lerp the weight over time
             float newWeight = Mathf.Lerp(startWeight, targetWeight, elapsedTime / duration);
             animator.SetLayerWeight(layerIndex, newWeight);
 
-            // Increment elapsed time
             elapsedTime += Time.deltaTime;
 
-            yield return null; // Wait for the next frame
+            yield return null; 
         }
 
-        // Ensure the weight is exactly 1 after the transition
         animator.SetLayerWeight(layerIndex, targetWeight);
     }
 
@@ -154,8 +147,8 @@ public class AnimationUtils : MonoBehaviour
     {
         if (animator != null)
         {
-            animator.Rebind();  // Reset internal animation state
-            animator.Update(0f);  // Apply changes immediately
+            animator.Rebind();
+            animator.Update(0f);
         }
     }
 

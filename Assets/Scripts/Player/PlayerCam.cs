@@ -14,6 +14,7 @@ public class PlayerCam : MonoBehaviour
     public Vector3 crouchingCamPos;
     public Vector3 standingCamPos;
     public float crouchingTranSpeed;
+
     public bool stopFollowingPlayer = false; // Add this bool to toggle camera follow
 
     public float xRotation;

@@ -84,7 +84,7 @@ public class LightingController
     public void EnableSpawnLightRange(Vector3[] lightPositions, GameObject playerObj)
     {
         Vector3 playerPos = miscUtils.GetPlayerPosition(playerObj);
-        Debug.Log($"Player pos: {playerPos}");
+        //Debug.Log($"Player pos: {playerPos}");
         
 
         // Iterate over all light positions
@@ -164,7 +164,7 @@ public class LightingController
             if (flickerTimers[light] >= flickerIntervals[light]) // Only update when timer exceeds interval
             {
                 light.intensity = UnityEngine.Random.Range(minIntensity, maxIntensity);
-                Debug.Log($"Light intensity updated to {light.intensity}");
+                //Debug.Log($"Light intensity updated to {light.intensity}");
 
                 flickerTimers[light] = 0f; // Reset timer
                 flickerIntervals[light] = UnityEngine.Random.Range(minInterval, maxInterval); // Assign new interval

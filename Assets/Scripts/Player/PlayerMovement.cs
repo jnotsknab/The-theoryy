@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("CamEffects")]
     private PlayerCamEffects playerCamEffects;
-    private bool wasInAir = false;
+    //private bool wasInAir = false;
 
     private void Start()
     {
@@ -66,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         MyInput();
-        HandleAnimations();
+        //HandleAnimations();
 
     }
 
@@ -176,31 +176,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private void HandleAnimations()
-    {
-        UpdateAnimator(armAnimator);
-        UpdateAnimator(sawedOffAnimator);
-    }
-    private void UpdateAnimator(Animator animator)
-    {
-        if (moveDirection == Vector3.zero)
-        {
-            animator.SetFloat("Speed", 0f, 0.05f, Time.deltaTime);
-        }
-        else if (moveDirection != Vector3.zero && !IsSprinting())
-        {
-            animator.SetFloat("Speed", 0.5f, 0.05f, Time.deltaTime);
-        }
-        else if (moveDirection != Vector3.zero && IsSprinting() && currentSprintTime > 0)
-        {
-            animator.SetFloat("Speed", 1f, 0.05f, Time.deltaTime);
-        }
-        else if (moveDirection != Vector3.zero && IsSprinting() && currentSprintTime <= 0)
-        {
-            animator.SetFloat("Speed", 0.5f, 0.05f, Time.deltaTime);
-        }
-    }
-
     /// <summary>
     /// Manages the playermovement and physics based operations. (called in FixedUpdate)
     /// </summary>
@@ -220,7 +195,6 @@ public class PlayerMovement : MonoBehaviour
             ApplyFallMultiplier(1.75f);
         }
 
-        UpdateSprintUI();
     }
 
     public void OnMove(InputAction.CallbackContext value)
@@ -252,19 +226,5 @@ public class PlayerMovement : MonoBehaviour
     {   
         return sprinting;
     }
-
-    public void UpdateSprintUI()
-    {
-        if (IsSprinting() && currentSprintTime > 0f)
-        {
-            currentSprintTime -= Time.deltaTime; // Deplete sprint meter when sprinting
-        }
-        else if (!IsSprinting() && currentSprintTime < sprintDuration)
-        {
-            currentSprintTime += Time.deltaTime * regenSpeed; // Regenerate sprint meter when not sprinting
-        }
-    }
-
-
 
 }
