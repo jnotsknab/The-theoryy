@@ -127,11 +127,11 @@ public class LightingController
             if (turnOn)
             {
                 audioHandler.PlaySources(light, true, true, 0.85f, 1.2f, 0.5f, 1f);
-                Debug.Log("Light was turned on");
+                //Debug.Log("Light was turned on");
             }
             else
             {
-                Debug.Log("Light was turned off");
+                //Debug.Log("Light was turned off");
                 audioHandler.FadeSources(light, false, 1f);
             }
         }

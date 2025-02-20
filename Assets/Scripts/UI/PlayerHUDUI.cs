@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class PlayerHUDUI : MonoBehaviour
 {
     [Header("Sprint Meter UI")]
-    public Image sprintMeterImage;  // Reference to the sprint meter UI image
+    public Image sprintMeterImage; 
     public PlayerMovement playerMovement;
 
 
@@ -35,4 +35,5 @@ public class PlayerHUDUI : MonoBehaviour
             playerMovement.currentSprintTime += Time.deltaTime * playerMovement.regenSpeed; // Regenerate sprint meter when not sprinting
         }
     }
+
 }

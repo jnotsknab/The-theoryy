@@ -22,6 +22,7 @@ public class ComputerScreenHandler : MonoBehaviour
     public CameraTransitionHandler camTransitionHandler;
 
     public bool isTurnedOn = false;
+    private bool canInteract = true;
 
     [Header("Cursor/Carat Stuff")]
     [SerializeField] private bool showCursor = true;
@@ -108,7 +109,7 @@ public class ComputerScreenHandler : MonoBehaviour
 
     private IEnumerator BootUpSequence()
     {
-
+        canInteract = false;
         foreach (string message in bootMessages)
         {
             // Clear the screen before displaying the next message
@@ -121,6 +122,7 @@ public class ComputerScreenHandler : MonoBehaviour
             yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
         }
         yield return new WaitForSeconds(0.5f);
+        canInteract = true;
         DisableScreen(commandHandler.bootText);
 
         //Testing for now later just call another coroutine here that activates the terminal.
@@ -144,7 +146,7 @@ public class ComputerScreenHandler : MonoBehaviour
 
     public void TurnOnComputer()
     {
-        if (!isTurnedOn)
+        if (canInteract && !isTurnedOn)
         {   
             hudViewPanel.SetActive(false);
             //turnOffUI.SetActive(true);
@@ -166,7 +168,7 @@ public class ComputerScreenHandler : MonoBehaviour
 
     public void TurnOffComputer()
     {
-        if (isTurnedOn)
+        if (canInteract && isTurnedOn)
         {
             hudViewPanel.SetActive(true);
             //turnOffUI.SetActive(false);

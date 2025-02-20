@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     public float airMultiplier;
     bool readyToJump;
     private bool jumpRequested = false;
+    public bool lockForwardMovement = false;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -105,6 +106,11 @@ public class PlayerMovement : MonoBehaviour
     {
         //Calc Move Direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+        //if (lockForwardMovement && verticalInput > 0)
+        //{
+        //    moveDirection.z = 0;
+        //}
 
         if (grounded)
         {   
@@ -226,5 +232,6 @@ public class PlayerMovement : MonoBehaviour
     {   
         return sprinting;
     }
+
 
 }

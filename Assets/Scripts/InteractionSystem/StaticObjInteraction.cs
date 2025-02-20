@@ -29,7 +29,7 @@ public class StaticObjInteraction : MonoBehaviour
 
         if (Physics.Raycast(transform.position, fwd, out hit, interactionRange, interactableLayer))
         {
-            Debug.Log($"Raycast hit: {hit.collider.gameObject.name}");
+            //Debug.Log($"Raycast hit: {hit.collider.gameObject.name}");
 
             InteractableObject newInteractable = hit.collider.GetComponent<InteractableObject>();
 

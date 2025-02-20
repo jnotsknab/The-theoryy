@@ -173,6 +173,7 @@ public class NewItemPickupHandler : MonoBehaviour
         armAnimator.gameObject.SetActive(false);
         armAnimator.gameObject.SetActive(true);
 
+        currentItemIDGlobal = 9999;
         Debug.Log("Dropped item");
 
     }

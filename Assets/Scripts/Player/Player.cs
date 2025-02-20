@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
     private GameObject playerObject;
     private GameObject playerSelf;
+    public GameObject rightHandEquipPos;
 
     public int playerHealth = 50;
     public GameObject[] spawnLightObjects;
@@ -143,6 +144,7 @@ public class Player : MonoBehaviour
 
     public void DisablePlayerMovement()
     {
+        DisableAllColliders();
         if (playerMovement == null)
         {
             playerMovement = playerSelf.GetComponent<PlayerMovement>();
@@ -152,13 +154,36 @@ public class Player : MonoBehaviour
     }
 
     public void EnablePlayerMovement()
-    {
+    {   
+        EnableAllColliders();
         if (playerMovement == null)
         {
             playerMovement = playerSelf.GetComponent<PlayerMovement>();
         }
         playerMovement.enabled = true;
 
+    }
+
+    private void DisableAllColliders()
+    {
+        if (rightHandEquipPos == null) return;
+
+        Collider[] colliders = rightHandEquipPos.GetComponentsInChildren<Collider>();
+        foreach (Collider col in colliders)
+        {
+            col.enabled = false;
+        }
+    }
+
+    private void EnableAllColliders()
+    {
+        if (rightHandEquipPos == null) return;
+
+        Collider[] colliders = rightHandEquipPos.GetComponentsInChildren<Collider>();
+        foreach (Collider col in colliders)
+        {
+            col.enabled = true;
+        }
     }
 
 

@@ -185,8 +185,7 @@ public class ShotgunLogic : MonoBehaviour
 
         for (int i = 0; i < numRays; i++)
         {
-            Vector3 spreadDirection = fpcam.transform.forward
-                                      + new Vector3(Random.Range(-spreadAngle, spreadAngle), Random.Range(-spreadAngle, spreadAngle), 0f);
+            Vector3 spreadDirection = fpcam.transform.forward + new Vector3(Random.Range(-spreadAngle, spreadAngle), Random.Range(-spreadAngle, spreadAngle), 0f);
 
             if (Physics.Raycast(fpcam.transform.position, spreadDirection.normalized, out hit, range))
             {
