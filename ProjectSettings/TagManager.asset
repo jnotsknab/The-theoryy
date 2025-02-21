@@ -10,6 +10,7 @@ TagManager:
   - LocationZone
   - PlayerSelf
   - Computer
+  - Antenna
   layers:
   - Default
   - TransparentFX
