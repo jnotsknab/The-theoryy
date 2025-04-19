@@ -8,7 +8,7 @@ using UnityEngine;
 public class StaticObjInteraction : MonoBehaviour
 {
 
-    [SerializeField] float interactionRange = 3f;
+    [SerializeField] float interactionRange = 2f;
     private LayerMask interactableLayer;
     private InteractableObject interactable;
 
@@ -48,6 +48,10 @@ public class StaticObjInteraction : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.Tab))
                 {
                     interactable.AlternateInteract();
+                }
+                if (Input.GetMouseButton(0))
+                {
+                    interactable.TertiaryInteract();
                 }
             }
         }

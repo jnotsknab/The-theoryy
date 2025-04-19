@@ -13,6 +13,7 @@ public class PlayerAnimationHandler : MonoBehaviour
     public Animator armAnimator;
     public Animator sawedOffAnimator;
     public Animator timeFluxAnimator;
+    public Animator inhalerAnimator;
 
     [Header("Movement Reference")]
     public PlayerMovement playerMovement;
@@ -45,6 +46,10 @@ public class PlayerAnimationHandler : MonoBehaviour
         if (newItemPickupHandler.currentItemIDGlobal == 1)
         {
             UpdateMovementBlendtree(timeFluxAnimator);
+        }
+        if (newItemPickupHandler.currentItemIDGlobal == 2)
+        {
+            UpdateMovementBlendtree(inhalerAnimator);
         }
 
     }

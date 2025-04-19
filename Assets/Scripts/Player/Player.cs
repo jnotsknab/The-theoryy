@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     private GameObject playerObject;
     private GameObject playerSelf;
     public GameObject rightHandEquipPos;
+    public PlayerCam playerCamScript;
 
     public int playerHealth = 50;
     public GameObject[] spawnLightObjects;
@@ -28,8 +29,6 @@ public class Player : MonoBehaviour
 
     public PlayerMovement playerMovement;
     public string currentLocation;
-
-    
 
     void Start()
     {
@@ -142,18 +141,27 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void DisablePlayerMovement()
+    public void DisablePlayerMovement(bool unlockCursor = false, bool lockMainCamRot = false)
     {
         DisableAllColliders();
+
         if (playerMovement == null)
         {
             playerMovement = playerSelf.GetComponent<PlayerMovement>();
         }
+
         playerMovement.enabled = false;
 
+        if (unlockCursor)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
+        playerCamScript.enabled = false;
     }
 
-    public void EnablePlayerMovement()
+    public void EnablePlayerMovement(bool lockCursor = true)
     {   
         EnableAllColliders();
         if (playerMovement == null)
@@ -161,6 +169,14 @@ public class Player : MonoBehaviour
             playerMovement = playerSelf.GetComponent<PlayerMovement>();
         }
         playerMovement.enabled = true;
+
+        if (lockCursor)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        playerCamScript.enabled = true;
 
     }
 

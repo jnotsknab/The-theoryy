@@ -23,8 +23,16 @@ public class ShotgunInteraction : MonoBehaviour
     {
         interactSource.clip = clip;
         audioHandler.PlaySource(interactSource, true, true, 0.4f, 0.6f, 0.75f, 1f);
-        if (!NewItemPickupHandler.Instance.pickedUp)
-            NewItemPickupHandler.Instance.PickupItem(sawedOffShotgun, sawedOffAnimator);
+        //if (!NewItemPickupHandler.Instance.pickedUp)
+        //{
+
+        //}
+        //else
+        //{
+        //    NewItemPickupHandler.Instance.SwitchItem(0, sawedOffAnimator);
+        //}
+        NewItemPickupHandler.Instance.PickupItem(sawedOffShotgun, sawedOffAnimator);
+
 
     }
 

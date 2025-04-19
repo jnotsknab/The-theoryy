@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -19,10 +20,15 @@ public class NewItemPickupHandler : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    public List<GameObject> groundedItems = new List<GameObject>();
     public Transform equipPos;
     public Camera playerCam;
     public bool pickedUp = false;
     public int? currentItemIDGlobal;
+    public HotbarSlot hotBar;
+
+    public bool isSwitchingItem = false;
 
     [Header("Drop Force")]
     public float throwForce = 1.5f;
@@ -66,6 +72,11 @@ public class NewItemPickupHandler : MonoBehaviour
     /// <param name="newItemAnimator">Optional Animator for the picked-up item. If provided, it will be assigned dynamically.</param>
     public void PickupItem(GameObject item, Animator newItemAnimator = null)
     {
+        if (currentItem != null)
+        {
+            currentItem.SetActive(false);
+            currentItem = null;
+        }
         currentItem = item;
         //interactable = currentItem.GetComponent<InteractableObject>();
 
@@ -75,6 +86,15 @@ public class NewItemPickupHandler : MonoBehaviour
         
         armAnimator.SetTrigger(PickupTrigger);
 
+        if (itemAnimator != null)
+        {
+            animationUtils.ResetAnimator(itemAnimator);
+            foreach (Animator childAnimator in itemAnimator.GetComponentsInChildren<Animator>())
+            {
+                animationUtils.ResetAnimator(childAnimator);
+            }
+            itemAnimator.gameObject.SetActive(false);
+        }
         // Set the item animator dynamically here
         if (newItemAnimator != null)
         {
@@ -93,7 +113,8 @@ public class NewItemPickupHandler : MonoBehaviour
     /// <param name="armAnimName">The name of the animation to play for the arm.</param>
     /// <param name="itemAnimName">The name of the animation to play for the dropped item.</param>
     public void DropItem(string armAnimName, string itemAnimName)
-    {
+    {   
+        currentItem = groundedItems[currentItemIDGlobal.Value];
         if (currentItem == null)
         {
             Debug.Log("Cannot Drop Item is null");
@@ -146,6 +167,7 @@ public class NewItemPickupHandler : MonoBehaviour
         //Reset the animated item's animator and the animators of its children to ensure were in the correct state when the item is picked up again, then disable the item.
         if (itemAnimator.gameObject.activeSelf)
         {
+            Debug.Log($"Animator reset with name {itemAnimator.gameObject.name}");
             animationUtils.ResetAnimator(itemAnimator);
             foreach (Animator childAnimator in itemAnimator.GetComponentsInChildren<Animator>())
             {
@@ -155,6 +177,7 @@ public class NewItemPickupHandler : MonoBehaviour
         }
 
         //Reinstantiate the item we picked up off the ground
+        currentItem = groundedItems[currentItemIDGlobal.Value];
         currentItem.SetActive(true);
         currentItem.transform.parent = null;
 
@@ -173,6 +196,7 @@ public class NewItemPickupHandler : MonoBehaviour
         armAnimator.gameObject.SetActive(false);
         armAnimator.gameObject.SetActive(true);
 
+        hotBar.SetSlotPopulated(hotBar.selectedIndex, false, 9999);
         currentItemIDGlobal = 9999;
         Debug.Log("Dropped item");
 
@@ -191,12 +215,15 @@ public class NewItemPickupHandler : MonoBehaviour
     /// Fetches data for the item being picked up based on the current item ID, afterwards it start the coroutine which handles playing the animations for the item.
     /// </summary>
     private void StartItemPickupSequence()
-    {
+    {   
+
         int? currentItemID = ItemManager.GetItemID(currentItemName);
         if (currentItemID.HasValue)
-        {
+        {   
+            hotBar.SelectFirstEmptySlot();
             currentItemIDGlobal = currentItemID.Value;
             itemData = ItemManager.GetItemData(currentItemID.Value);
+            hotBar.SetSlotPopulated(hotBar.selectedIndex, true, currentItemIDGlobal.Value);
             Debug.Log($"Item id is {currentItemID}");
         }
         else
@@ -218,6 +245,70 @@ public class NewItemPickupHandler : MonoBehaviour
             itemData.movementAnimation
         ));
     }
+
+    private IEnumerator waitForArms()
+    {
+        while (armAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
+        {
+            yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Similar to pickup item, except the method handles only the animated item, ideal for swapping items in a hotbar.
+    /// </summary>
+    /// <param name="itemID"></param>
+    /// <param name="newItemAnimator"></param>
+    public void SwitchItem(int itemID, Animator newItemAnimator)
+    {
+        if (isSwitchingItem || itemID == currentItemIDGlobal) return; // prevent switching during animation
+
+        isSwitchingItem = true;
+
+        StartCoroutine(SwitchItemRoutine(itemID, newItemAnimator));
+    }
+
+
+    private IEnumerator SwitchItemRoutine(int itemID, Animator newItemAnimator)
+    {
+        yield return StartCoroutine(waitForArms());
+
+        itemData = ItemManager.GetItemData(itemID);
+        armAnimator.SetTrigger(PickupTrigger);
+
+        Debug.Log($"Switch Item invoked with item id {itemID}");
+        if (itemData != null)
+        {
+            currentItemIDGlobal = itemID;
+            Debug.Log("Animator reset");
+            animationUtils.ResetAnimator(itemAnimator);
+            foreach (Animator childAnimator in itemAnimator.GetComponentsInChildren<Animator>())
+            {
+                animationUtils.ResetAnimator(childAnimator);
+            }
+            itemAnimator.gameObject.SetActive(false);
+
+            if (newItemAnimator != null)
+            {
+                SetItemAnimator(newItemAnimator);
+                Debug.Log($"New Item animator set as {newItemAnimator.name}");
+            }
+
+            Debug.Log($"Starting movement with movement layer {itemData.movementLayer}, and movement animation {itemData.movementAnimation}, and current item id is {currentItemIDGlobal.Value}");
+
+            yield return StartCoroutine(PickupAnimRoutine(
+                armAnimator,
+                itemAnimator,
+                itemData.pickupLayer,
+                itemData.pickupAnimation,
+                itemData.movementLayer,
+                itemData.movementAnimation
+            ));
+        }
+
+        isSwitchingItem = false; // allow switching again
+    }
+
 
     /// <summary>
     /// This method completes the item pickup sequence and enters into the final animation state (movement) for the item.

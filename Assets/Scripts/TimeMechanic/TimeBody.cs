@@ -11,17 +11,16 @@ public class TimeBody : MonoBehaviour
 
     private List<TimeTransformData> pointsInTime;
 
-    public CameraDistortion cameraDistortion;
+    //public CameraDistortion cameraDistortion;
     public float recordTime = 5f;
     private int rewindSpeedMultiplier = 2;
 
-    
 
     void Start()
     {
         pointsInTime = new List<TimeTransformData>();
         rb = GetComponent<Rigidbody>();
-        
+
     }
 
     void Update()

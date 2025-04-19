@@ -249,6 +249,7 @@ public class ShotgunLogic : MonoBehaviour
         yield return null;
     }
 
+    //Invoked through animation event on the shoot animation.
     public void ResetToMovementState()
     {
 

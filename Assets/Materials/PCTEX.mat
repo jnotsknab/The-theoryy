@@ -14,6 +14,7 @@ Material:
   m_ValidKeywords:
   - _COLORBLEED_ON
   - _DISPLAY_COLOR
+  - _PIP_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -70,7 +71,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _PiPTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 8600000, guid: 1dd28e1b65741a742a703b62b8310ffe, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ShadowMask:
@@ -105,7 +106,7 @@ Material:
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _ColorBleed: 1
-    - _Composite: 1
+    - _Composite: 0.89
     - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
@@ -128,8 +129,8 @@ Material:
     - _OverscanX: 0
     - _OverscanY: 0
     - _Parallax: 0.005
-    - _PiP: 0
-    - _PiPAlpha: 1
+    - _PiP: 1
+    - _PiPAlpha: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
@@ -147,7 +148,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _OverscanColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RGBA: {r: 1, g: 0.5046427, b: 0, a: 1}
+    - _RGBA: {r: 0.8018868, g: 0.38173735, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &7647152668572626437

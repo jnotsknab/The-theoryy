@@ -23,8 +23,8 @@ public class TimefluxInteraction : MonoBehaviour
     {
         interactSource.clip = clip;
         audioHandler.PlaySource(interactSource, true, true, 1.25f, 1.5f, 0.75f, 1f);
-        if (!NewItemPickupHandler.Instance.pickedUp)
-            NewItemPickupHandler.Instance.PickupItem(timefluxDevice, timefluxAnimator);
+        NewItemPickupHandler.Instance.PickupItem(timefluxDevice, timefluxAnimator);
+
 
     }
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +11,7 @@ public class TimefluxLogic : MonoBehaviour
     public GameObject vfxScanner;
     public AudioClip[] clips;
     private ParticleSystem scannerSphere;
+    public GameObject objParticlePrefab;
     private AudioSource audioSource;
 
     private GameObject antenna;
@@ -23,6 +25,7 @@ public class TimefluxLogic : MonoBehaviour
     public float drainRate;
 
     private bool visualDisableInvoked = false;
+    private List<TimeBody> timeBodies = new List<TimeBody>();
 
     //Scan Collision Detection
     private List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
@@ -53,10 +56,11 @@ public class TimefluxLogic : MonoBehaviour
         mode = Mode.PlayerRewind;
         VisualizeModes();
         audioSource = this.gameObject.GetComponent<AudioSource>();
-        maxCharge = 100f;
+        maxCharge = 10000f;
         //Set battery to max on awake
         batteryCharge = maxCharge;
         drainRate = 10.0f;
+        timeBodies.Clear();
         
     }
 
@@ -70,6 +74,13 @@ public class TimefluxLogic : MonoBehaviour
         if (IsEquipped() && mode == Mode.PlayerRewind && context.performed)
         {
             playerTimeBody.StartRewind();
+        }
+        else if (IsEquipped() && timeBodies.Count > 0 && mode == Mode.ObjectRewind && context.performed)
+        {
+            foreach (var body in timeBodies)
+            {
+                body.StartRewind();
+            }
         }
         
 
@@ -113,6 +124,7 @@ public class TimefluxLogic : MonoBehaviour
         {
             //Set clip to toggle clip
             audioSource.clip = clips[0];
+            audioSource.volume = 0.75f;
             audioSource.Play();
             mode = (Mode)(((int)mode + 1) % System.Enum.GetValues(typeof(Mode)).Length);
             VisualizeModes();
@@ -220,7 +232,33 @@ public class TimefluxLogic : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Trigger entered by: " + other.gameObject.name);
+        TimeBody timeBody = other.gameObject.AddComponent<TimeBody>();
+        timeBody.timefluxLogic = this;
+        timeBodies.Add(timeBody);
+        StartCoroutine(DoObjParticle(other.gameObject, timeBody));
     }
+
+    private IEnumerator DoObjParticle(GameObject obj, TimeBody timeBody)
+    {
+        if (obj == null)
+        {
+            Debug.LogError("Parameter obj is null.");
+            yield break;
+        }
+
+        GameObject particleObj = Instantiate(objParticlePrefab, obj.transform);
+        particleObj.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForSeconds(10);
+
+        Destroy(timeBody);
+        Destroy(particleObj);
+        timeBodies.Clear();
+        Rigidbody rb = obj.GetComponent<Rigidbody>();
+        if (rb != null ) rb.isKinematic = false;
+
+    }
+
 
 
 

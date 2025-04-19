@@ -1,12 +1,14 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
 
+
 public class ComputerCommandHandler : MonoBehaviour
 {
-    private Dictionary<string, Command> commands = new Dictionary<string, Command>();
+    public ComputerScreenHandler computerScreenHandler;
+    public Dictionary<string, Command> commands = new Dictionary<string, Command>();
 
     public TMP_Text bootText;
     public TMP_Text terminalText;
@@ -15,6 +17,8 @@ public class ComputerCommandHandler : MonoBehaviour
     public TMP_Text logText;
     public TMP_Text timeMachineText;
     public TMP_Text bestiaryText;
+
+    public TMP_Text dataUploadText;
 
     [Header("Entry strings for the various computer menus")]
     public string shopInfo;
@@ -31,6 +35,7 @@ public class ComputerCommandHandler : MonoBehaviour
     private void Awake()
     {
         RegisterEntryCommands();
+        RegisterTimeMachineCommands();
         RegisterStrings();
     }
 
@@ -40,37 +45,37 @@ public class ComputerCommandHandler : MonoBehaviour
             "Log",
             null,
             new List<TMP_Text> { logText },
-            new List<TMP_Text> { terminalText, shopText, upgradeText, timeMachineText, bestiaryText }
+            new List<TMP_Text> { terminalText, shopText, upgradeText, timeMachineText, bestiaryText, dataUploadText }
         ));
         commands.Add("terminal", new Command(
             "Terminal",
             null,
             new List<TMP_Text> { terminalText },
-            new List<TMP_Text> { logText, upgradeText, timeMachineText, shopText, bestiaryText }
+            new List<TMP_Text> { logText, upgradeText, timeMachineText, shopText, bestiaryText, dataUploadText }
         ));
         commands.Add("shop", new Command(
             "Shop",
             null,
             new List<TMP_Text> { shopText },
-            new List<TMP_Text> { terminalText, logText, upgradeText, timeMachineText, bestiaryText }
+            new List<TMP_Text> { terminalText, logText, upgradeText, timeMachineText, bestiaryText, dataUploadText }
         ));
         commands.Add("upgrades", new Command(
             "Upgrades",
             null,
             new List<TMP_Text> { upgradeText },
-            new List<TMP_Text> { terminalText, logText, timeMachineText, shopText, bestiaryText }
+            new List<TMP_Text> { terminalText, logText, timeMachineText, shopText, bestiaryText, dataUploadText }
         ));
         commands.Add("jumper", new Command(
             "The Jumper",
             null,
             new List<TMP_Text> { timeMachineText },
-            new List<TMP_Text> { terminalText, upgradeText, shopText, logText, bestiaryText }
+            new List<TMP_Text> { terminalText, upgradeText, shopText, logText, bestiaryText, dataUploadText }
         ));
         commands.Add("bestiary", new Command(
             "Bestiary",
             null,
             new List<TMP_Text> { bestiaryText },
-            new List<TMP_Text> { terminalText, upgradeText, logText, timeMachineText, shopText }
+            new List<TMP_Text> { terminalText, upgradeText, logText, timeMachineText, shopText, dataUploadText }
         ));
 
     }
@@ -87,7 +92,13 @@ public class ComputerCommandHandler : MonoBehaviour
 
     private void RegisterTimeMachineCommands()
     {
-
+        commands.Add("2000", new Command(
+            "Time data upload",
+            null,
+            new List<TMP_Text> { dataUploadText },
+            new List<TMP_Text> { terminalText, upgradeText, logText, timeMachineText, shopText, bestiaryText },
+            computerScreenHandler.TimeDataSequence
+        ));
     }
 
     private void RegisterBestiaryCommands()
@@ -118,6 +129,7 @@ public class ComputerCommandHandler : MonoBehaviour
                 }
             }
 
+            command.commandAction?.Invoke();
             Debug.Log(command.response);
         }
         else
@@ -133,9 +145,10 @@ public class ComputerCommandHandler : MonoBehaviour
         //will need to implement a way to update the upgrade info based on if the user has bought the upgrade already
         //For example if we buy the initial stamina upgrade it should update to the next stamina upgrade thats more expensive.
         upgradeInfo = " > Stamina : 40 Echos\n > Rewind Charge : 75 Echos\n > Rewind Duration : 100 Echos\n > Rewind Cooldown : 150 Echos";
-        timeMachineInfo = " > Enter a year between 2056 - 2101 to prime The Jumper\n  <Warning : Priming the Jumper many times will decrease timeline stability> ";
+        timeMachineInfo = " > Enter a year between 2056 - 2101 to prime The Jumper\n  <Warning : Priming the jumper will trigger anomoly B, REMAIN CAUTIOUS DURING THE PRIMING SEQUENCE USE THE CAMERA ON THE OTHER TERMINAL TO YOUR ADVANTAGE.> ";
         bestiaryInfo = " > Anomolie(s) haven't been encountered";
     }
+
 
 
 
@@ -147,12 +160,14 @@ public struct Command
     public string response;
     public List<TMP_Text> enableElements;
     public List<TMP_Text> disableElements;
+    public Action commandAction; // Function to execute when the command is run
 
-    public Command(string name, string response, List<TMP_Text> enableElements, List<TMP_Text> disableElements)
+    public Command(string name, string response, List<TMP_Text> enableElements, List<TMP_Text> disableElements, Action commandAction = null)
     {
         this.name = name;
         this.response = response;
         this.enableElements = enableElements;
         this.disableElements = disableElements;
+        this.commandAction = commandAction;
     }
 }

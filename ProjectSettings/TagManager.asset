@@ -11,6 +11,15 @@ TagManager:
   - PlayerSelf
   - Computer
   - Antenna
+  - timefluxdevice
+  - RightHandEquip
+  - ItemWheel
+  - MainComputerScreen
+  - GlobalLighting
+  - Jumper
+  - ImpactLight
+  - JumperLever
+  - InitLight
   layers:
   - Default
   - TransparentFX
@@ -28,7 +37,7 @@ TagManager:
   - Items
   - GroundedItems
   - StaticObjInteraction
-  - 
+  - IgnoreFromCertainCams
   - 
   - 
   - 

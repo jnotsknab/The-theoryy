@@ -1,9 +1,11 @@
 using TMPro;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 
 public class ComputerScreenHandler : MonoBehaviour
-{
+{   
     [SerializeField] ComputerCommandHandler commandHandler;
     [SerializeField] AudioHandler audioHandler = new AudioHandler();
 
@@ -13,6 +15,7 @@ public class ComputerScreenHandler : MonoBehaviour
     //public GameObject turnOffUI;
     public GameObject hudViewPanel;
     public GameObject securityFeed;
+    private LightUtils lightUtils;
 
     [Header("Audio Stuff")]
     private AudioSource computerSFXSource;
@@ -20,6 +23,7 @@ public class ComputerScreenHandler : MonoBehaviour
     public AudioClip powerOnClip;
     public AudioClip keyboardClip;
     public CameraTransitionHandler camTransitionHandler;
+    private AudioSource dataUploadSource;
 
     public bool isTurnedOn = false;
     private bool canInteract = true;
@@ -29,12 +33,18 @@ public class ComputerScreenHandler : MonoBehaviour
     [SerializeField] public float cursorBlinkRate;
     [SerializeField] private Coroutine cursorRoutine;
 
+    [Header("Data Upload Stuff")]
+    private float uploadTime;
+    private float elapsedTime;
+    private int percentage;
+    public List<Material> indicatorEmissionLights;
 
     public Material screenMat;
     public GameObject computerLight;
 
     private string currentCommand = "";
     private string initialText = " > Log\n\n > Shop\n\n > Upgrades\n\n > Bestiary\n\n > The Jumper\n\n Command: ";
+    private string autoCompleteMatch = "";
 
     private string[] bootMessages = new string[]
     {
@@ -67,14 +77,17 @@ public class ComputerScreenHandler : MonoBehaviour
     private void GetRefs()
     {
         computerHolder = GameObject.FindGameObjectWithTag("Computer");
+        lightUtils = GameObject.FindGameObjectWithTag("GlobalLighting").GetComponent<LightUtils>();
         computerSFXSource = computerHolder.GetComponent<AudioSource>();
+        dataUploadSource = commandHandler.dataUploadText.gameObject.GetComponent<AudioSource>();
+        dataUploadSource.volume = 0.4f;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        AutoSearch();
         if (!isTurnedOn)
             return;
 
@@ -169,7 +182,8 @@ public class ComputerScreenHandler : MonoBehaviour
     public void TurnOffComputer()
     {
         if (canInteract && isTurnedOn)
-        {
+        {   
+
             hudViewPanel.SetActive(true);
             //turnOffUI.SetActive(false);
             computerLight.SetActive(false);
@@ -186,6 +200,8 @@ public class ComputerScreenHandler : MonoBehaviour
             //Ensures we dont cut off the turn off audio before it finishes.
             Invoke(nameof(DisableComputerAudio), computerSFXSource.clip.length);
             DisableAllScreens();
+            DisableCoroutines();
+            
         }
     }
 
@@ -226,12 +242,27 @@ public class ComputerScreenHandler : MonoBehaviour
         commandHandler.upgradeText.enabled = false;
         commandHandler.timeMachineText.enabled = false;
         commandHandler.bestiaryText.enabled = false;
+        commandHandler.dataUploadText.enabled = false;
     }
 
     //Only needed for disable as we use invoke and we have to pass a function to it.
     private void DisableComputerAudio()
     {
         computerSFXSource.enabled = false;
+        dataUploadSource.Stop();
+    }
+
+    private void DisableCoroutines()
+    {
+        StopCoroutine(DataUploadSequence());
+    }
+
+    private void DisableIndicatorLightEmission()
+    {
+        for (int i = 0; i < indicatorEmissionLights.Count; i++)
+        {
+            indicatorEmissionLights[i].DisableKeyword("_EMISSION");
+        }
     }
 
     //Handles all command input for the entry terminal after the boot sequence.
@@ -279,6 +310,7 @@ public class ComputerScreenHandler : MonoBehaviour
         string cursor = showCursor ? "_" : " ";
         commandHandler.bestiaryText.text = commandHandler.bestiaryInfo + $"\n\n Command <AnomolyName> or <Terminal>: {currentCommand}" + cursor;
     }
+
     private void ExecInput()
     {
         foreach (char c in Input.inputString)
@@ -293,6 +325,7 @@ public class ComputerScreenHandler : MonoBehaviour
             else if (c == '\n' || c == '\r')
             {
                 Debug.Log("Command Entered: " + currentCommand);
+                currentCommand = autoCompleteMatch;
                 commandHandler.ExecuteCommand(currentCommand);
                 currentCommand = "";
             }
@@ -301,5 +334,59 @@ public class ComputerScreenHandler : MonoBehaviour
                 currentCommand += c;
             }
         }
+    }
+
+    private void AutoSearch()
+    {
+        if (string.IsNullOrEmpty(currentCommand)) return;
+
+        string bestMatch = commandHandler.commands.Keys
+            .Where(cmd => cmd.StartsWith(currentCommand)) // Find possible matches
+            .OrderBy(cmd => cmd.Length) // Prioritize shorter matches
+            .FirstOrDefault();
+
+        if (!string.IsNullOrEmpty(bestMatch) && bestMatch != currentCommand)
+        {
+            Debug.Log($"Auto-complete suggestion: {bestMatch}");
+            autoCompleteMatch = bestMatch;
+            
+        }
+    }
+
+    public void TimeDataSequence()
+    {   
+        dataUploadSource.Play();
+        StartCoroutine(DataUploadSequence());
+    }
+    private IEnumerator DataUploadSequence()
+    {
+        uploadTime = Random.Range(5f, 10f); // Choose a time between 1 to 3 minutes
+        elapsedTime = 0f;
+        percentage = 0;
+        
+        while (elapsedTime < uploadTime)
+        {
+            elapsedTime += Time.deltaTime;
+            percentage = Mathf.Clamp(Mathf.RoundToInt((elapsedTime / uploadTime) * 100f), 0, 100);
+            commandHandler.dataUploadText.text = $"{percentage} %";
+
+            yield return null; // Wait until next frame
+        }
+
+        dataUploadSource.Stop();
+        //enable however many of the spawn terminal lights that correspond to the jumper the player has unlocked here
+        indicatorEmissionLights[0].EnableKeyword("_EMISSION");
+        //Transfer this stuff to its own method later.
+        LeverLogic leverLogic = GameObject.FindGameObjectWithTag("JumperLever").GetComponent<LeverLogic>();
+        leverLogic.leverEnabled = true;
+
+
+    }
+
+    private void OnDisable()
+    {   
+
+        dataUploadSource.Stop();
+
     }
 }

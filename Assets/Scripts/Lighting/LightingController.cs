@@ -108,7 +108,7 @@ public class LightingController
             }
             else if (distance <= playerDetectionRadius && activeLights.Contains(lightPos))
             {
-                LightFlicker(lightPos, 0.5f, 2f, 0f, 1.1f, Time.deltaTime);
+                LightFlicker(lightPos, 0.5f, 2f, 0f, 3f, Time.deltaTime);
             }
             
         }
